@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#f4f1ea">
+<title>Carnet</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #f4f1ea; }
+  body { display: flex; align-items: center; justify-content: center; font-family: Georgia, serif; }
+  input { width: min(78vw, 340px); font: inherit; font-size: 18px; color: #3b3a36; background: transparent;
+          border: none; border-bottom: 1px solid #cfc9bb; padding: 8px 2px; outline: none; text-align: center; }
+  input:focus { border-color: #8f897b; }
+  input::placeholder { color: #c4beb0; }
+  .shake { animation: sh .35s; }
+  @keyframes sh { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+</style>
+</head>
+<body>
+<form id="f" autocomplete="off"><input id="p" placeholder="…" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go"></form>
+<script>
+const norm = (s) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, " ").trim();
+async function digest(s) {
+  const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
+  return [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, "0")).join("").slice(0, 24);
+}
+async function tryKey(k) {
+  try { const r = await fetch("./" + k + "/index.html", { method: "HEAD", cache: "no-store" }); return r.ok; } catch (e) { return false; }
+}
+const p = document.getElementById("p");
+const saved = localStorage.getItem("carnet_k");
+if (saved) tryKey(saved).then((ok) => { if (ok) location.replace("./" + saved + "/"); else localStorage.removeItem("carnet_k"); });
+document.getElementById("f").onsubmit = async (e) => {
+  e.preventDefault();
+  const k = await digest(norm(p.value));
+  if (p.value.trim() && await tryKey(k)) { localStorage.setItem("carnet_k", k); location.href = "./" + k + "/"; return; }
+  p.value = ""; p.classList.remove("shake"); void p.offsetWidth; p.classList.add("shake");
+};
+</script>
+</body>
+</html>

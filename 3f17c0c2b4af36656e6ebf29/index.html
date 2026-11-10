@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0f1424">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="robots" content="noindex, nofollow">
+  <title>BRICKS</title>
+  <link rel="stylesheet" href="css/style.css?v=20261110152614">
+</head>
+<body>
+  <!-- Barre du haut (générée selon la langue du parcours) -->
+  <header id="topbar"></header>
+
+  <main>
+    <section id="tree-wrap">
+      <div class="band-title" id="band-grammar"></div>
+      <div id="skills-band"></div>
+      <div class="band-title" id="band-vocab"></div>
+      <div id="tree">
+        <svg id="links"></svg>
+        <div id="nodes"></div>
+      </div>
+    </section>
+
+    <!-- Panneau de détail : colonne sur ordinateur, feuille glissante sur mobile -->
+    <aside id="panel">
+      <div class="sheet-head"><span class="sheet-grip"></span><button id="sheet-close" class="m-close">✕</button></div>
+      <div id="panel-body"></div>
+    </aside>
+  </main>
+  <div id="sheet-bg" class="hidden"></div>
+
+  <!-- Écran de choix du profil -->
+  <div id="screen" class="hidden"></div>
+
+  <!-- Fenêtre d'exercice / leçon -->
+  <div id="overlay" class="hidden">
+    <div id="modal"></div>
+  </div>
+
+  <div id="toasts"></div>
+
+  <script src="js/i18n.js?v=20261110152614"></script>
+  <script src="js/data-en.js?v=20261110152614"></script>
+  <script src="js/data-fr.js?v=20261110152614"></script>
+  <script src="js/testmode.js?v=20261110152614"></script>
+  <script src="js/online.js?v=20261110152614"></script>
+  <script src="js/changelog.js?v=20261110152614"></script>
+  <script src="js/boss.js?v=20261110152614"></script>
+  <script src="js/game.js?v=20261110152614"></script>
+</body>
+</html>

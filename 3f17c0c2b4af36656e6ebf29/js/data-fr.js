@@ -1,0 +1,208 @@
+// =====================================================================
+//  PARCOURS « FRANÇAIS » — pour un anglophone américain (interface en anglais US)
+//  Mots : "français=English"   (variantes acceptées séparées par "/")
+//  Les noms sont appris avec leur article (un / une) pour retenir le genre.
+//  Phrases : "FR aff | FR nég | FR question || EN aff | EN neg | EN question"
+//  Questions : forme « Est-ce que … ? » (celle enseignée dans la leçon)
+// =====================================================================
+var COURSES = window.COURSES || (window.COURSES = {});
+
+COURSES.fr = {
+  id: "fr", target: "fr", ui: "en", flag: "🇫🇷",
+  tagline: "French, brick by brick",
+  bricks: [
+    {
+      id: "basics", name: "First words", icon: "👋",
+      words: ["bonjour=hello", "au revoir=goodbye", "oui=yes", "non=no", "s'il te plaît/s'il vous plaît=please",
+        "merci=thank you", "désolé/désolée=sorry", "un ami=a friend", "un homme=a man", "une femme=a woman"],
+      sentences: [
+        "C'est mon ami. | Ce n'est pas mon ami. | Est-ce que c'est ton ami ? || He's my friend. | He's not my friend. | Is he your friend?",
+        "La femme est mon amie. | La femme n'est pas mon amie. | Est-ce que la femme est ton amie ? || The woman is my friend. | The woman is not my friend. | Is the woman your friend?",
+        "Je suis désolé. | Je ne suis pas désolé. | Est-ce que tu es désolé ? || I'm sorry. | I'm not sorry. | Are you sorry?",
+        "L'homme dit bonjour. | L'homme ne dit pas bonjour. | Est-ce que l'homme dit bonjour ? || The man says hello. | The man doesn't say hello. | Does the man say hello?",
+        "Tu dis merci. | Tu ne dis pas merci. | Est-ce que tu dis merci ? || You say thank you. | You don't say thank you. | Do you say thank you?",
+        "Elle dit au revoir. | Elle ne dit pas au revoir. | Est-ce qu'elle dit au revoir ? || She says goodbye. | She doesn't say goodbye. | Does she say goodbye?",
+      ],
+    },
+    {
+      id: "pronouns", name: "Pronouns & être", icon: "🧍",
+      words: ["je=I", "tu=you (informal)", "il=he", "elle=she", "nous=we", "vous=you (formal / plural)",
+        "ils/elles=they", "suis=am (je suis)", "est=is (il est)", "sont=are (ils sont)"],
+      sentences: [
+        "Nous sommes amis. | Nous ne sommes pas amis. | Est-ce que nous sommes amis ? || We are friends. | We are not friends. | Are we friends?",
+        "Elle est ici. | Elle n'est pas ici. | Est-ce qu'elle est ici ? || She is here. | She is not here. | Is she here?",
+        "Ils sont ici. | Ils ne sont pas ici. | Est-ce qu'ils sont ici ? || They are here. | They are not here. | Are they here?",
+        "Tu es mon ami. | Tu n'es pas mon ami. | Est-ce que tu es mon ami ? || You are my friend. | You are not my friend. | Are you my friend?",
+        "Je suis ton ami. | Je ne suis pas ton ami. | Est-ce que je suis ton ami ? || I am your friend. | I am not your friend. | Am I your friend?",
+        "Vous êtes ici. | Vous n'êtes pas ici. | Est-ce que vous êtes ici ? || You are here. | You are not here. | Are you here?",
+      ],
+    },
+    {
+      id: "colors", name: "Colors", icon: "🎨",
+      words: ["rouge=red", "bleu=blue", "vert=green", "jaune=yellow", "noir=black", "blanc=white",
+        "orange=orange", "rose=pink", "marron=brown", "gris=gray"],
+      sentences: [
+        "Le ciel est bleu. | Le ciel n'est pas bleu. | Est-ce que le ciel est bleu ? || The sky is blue. | The sky is not blue. | Is the sky blue?",
+        "La voiture est rouge. | La voiture n'est pas rouge. | Est-ce que la voiture est rouge ? || The car is red. | The car is not red. | Is the car red?",
+        "Mon sac est noir. | Mon sac n'est pas noir. | Est-ce que ton sac est noir ? || My bag is black. | My bag is not black. | Is your bag black?",
+        "Les fleurs sont roses. | Les fleurs ne sont pas roses. | Est-ce que les fleurs sont roses ? || The flowers are pink. | The flowers are not pink. | Are the flowers pink?",
+        "L'herbe est verte. | L'herbe n'est pas verte. | Est-ce que l'herbe est verte ? || The grass is green. | The grass is not green. | Is the grass green?",
+        "J'aime le jaune. | Je n'aime pas le jaune. | Est-ce que tu aimes le jaune ? || I like yellow. | I don't like yellow. | Do you like yellow?",
+      ],
+    },
+    {
+      id: "numbers", name: "Numbers", icon: "🔢",
+      words: ["un/une=one", "deux=two", "trois=three", "quatre=four", "cinq=five", "six=six",
+        "sept=seven", "huit=eight", "neuf=nine", "dix=ten"],
+      sentences: [
+        "J'ai deux chats. | Je n'ai pas deux chats. | Est-ce que tu as deux chats ? || I have two cats. | I don't have two cats. | Do you have two cats?",
+        "Elle a dix ans. | Elle n'a pas dix ans. | Est-ce qu'elle a dix ans ? || She is ten. | She is not ten. | Is she ten?",
+        "Il a cinq amis. | Il n'a pas cinq amis. | Est-ce qu'il a cinq amis ? || He has five friends. | He doesn't have five friends. | Does he have five friends?",
+        "Mon fils a six ans. | Mon fils n'a pas six ans. | Est-ce que ton fils a six ans ? || My son is six. | My son is not six. | Is your son six?",
+        "Nous voulons trois pommes. | Nous ne voulons pas trois pommes. | Est-ce que vous voulez trois pommes ? || We want three apples. | We don't want three apples. | Do you want three apples?",
+        "Ils ont huit livres. | Ils n'ont pas huit livres. | Est-ce qu'ils ont huit livres ? || They have eight books. | They don't have eight books. | Do they have eight books?",
+      ],
+    },
+    {
+      id: "family", name: "Family", icon: "👨‍👩‍👧",
+      words: ["une mère=a mother", "un père=a father", "un frère=a brother", "une sœur=a sister", "un fils=a son",
+        "une fille=a daughter", "un bébé=a baby", "une grand-mère=a grandmother", "un grand-père=a grandfather", "une famille=a family"],
+      sentences: [
+        "C'est ma sœur. | Ce n'est pas ma sœur. | Est-ce que c'est ta sœur ? || She's my sister. | She's not my sister. | Is she your sister?",
+        "Mon père est ici. | Mon père n'est pas ici. | Est-ce que ton père est ici ? || My father is here. | My father is not here. | Is your father here?",
+        "J'ai un frère. | Je n'ai pas de frère. | Est-ce que tu as un frère ? || I have a brother. | I don't have a brother. | Do you have a brother?",
+        "Ma mère aime le thé. | Ma mère n'aime pas le thé. | Est-ce que ta mère aime le thé ? || My mother likes tea. | My mother doesn't like tea. | Does your mother like tea?",
+        "C'est mon grand-père. | Ce n'est pas mon grand-père. | Est-ce que c'est ton grand-père ? || He's my grandfather. | He's not my grandfather. | Is he your grandfather?",
+        "Nous avons un bébé. | Nous n'avons pas de bébé. | Est-ce que vous avez un bébé ? || We have a baby. | We don't have a baby. | Do you have a baby?",
+      ],
+    },
+    {
+      id: "verbs", name: "Everyday verbs", icon: "🏃",
+      words: ["aimer=to like / to love", "adorer=to adore / to love", "vouloir=to want", "avoir=to have", "manger=to eat",
+        "boire=to drink", "aller=to go", "voir=to see", "jouer=to play", "lire=to read"],
+      sentences: [
+        "J'aime le thé. | Je n'aime pas le thé. | Est-ce que tu aimes le thé ? || I like tea. | I don't like tea. | Do you like tea?",
+        "Il joue au football. | Il ne joue pas au football. | Est-ce qu'il joue au football ? || He plays soccer. | He doesn't play soccer. | Does he play soccer?",
+        "Ils mangent du pain. | Ils ne mangent pas de pain. | Est-ce qu'ils mangent du pain ? || They eat bread. | They don't eat bread. | Do they eat bread?",
+        "Elle lit un livre. | Elle ne lit pas de livre. | Est-ce qu'elle lit un livre ? || She reads a book. | She doesn't read a book. | Does she read a book?",
+        "Tu veux de l'eau. | Tu ne veux pas d'eau. | Est-ce que tu veux de l'eau ? || You want water. | You don't want water. | Do you want water?",
+        "Je vais à l'école. | Je ne vais pas à l'école. | Est-ce que tu vas à l'école ? || I go to school. | I don't go to school. | Do you go to school?",
+        "Nous voyons la mer. | Nous ne voyons pas la mer. | Est-ce que vous voyez la mer ? || We see the ocean. | We don't see the ocean. | Do you see the ocean?",
+      ],
+    },
+    {
+      id: "adjectives", name: "Adjectives", icon: "✨",
+      words: ["grand=big / tall", "petit=small / short", "bon=good", "mauvais=bad", "heureux=happy", "triste=sad",
+        "chaud=hot", "froid=cold", "neuf/nouveau=new", "vieux=old"],
+      sentences: [
+        "Je suis heureux. | Je ne suis pas heureux. | Est-ce que tu es heureux ? || I am happy. | I am not happy. | Are you happy?",
+        "La maison est grande. | La maison n'est pas grande. | Est-ce que la maison est grande ? || The house is big. | The house is not big. | Is the house big?",
+        "Le thé est chaud. | Le thé n'est pas chaud. | Est-ce que le thé est chaud ? || The tea is hot. | The tea is not hot. | Is the tea hot?",
+        "Il fait froid aujourd'hui. | Il ne fait pas froid aujourd'hui. | Est-ce qu'il fait froid aujourd'hui ? || It's cold today. | It's not cold today. | Is it cold today?",
+        "Mon téléphone est neuf. | Mon téléphone n'est pas neuf. | Est-ce que ton téléphone est neuf ? || My phone is new. | My phone is not new. | Is your phone new?",
+        "Ils sont tristes. | Ils ne sont pas tristes. | Est-ce qu'ils sont tristes ? || They are sad. | They are not sad. | Are they sad?",
+      ],
+    },
+    {
+      id: "animals", name: "Animals", icon: "🐾",
+      words: ["un chat=a cat", "un chien=a dog", "un oiseau=a bird", "un poisson=a fish", "un cheval=a horse",
+        "une vache=a cow", "une souris=a mouse", "un lapin=a rabbit", "un lion=a lion", "un canard=a duck"],
+      sentences: [
+        "Le chat est noir. | Le chat n'est pas noir. | Est-ce que le chat est noir ? || The cat is black. | The cat is not black. | Is the cat black?",
+        "J'ai un chien. | Je n'ai pas de chien. | Est-ce que tu as un chien ? || I have a dog. | I don't have a dog. | Do you have a dog?",
+        "L'oiseau est bleu. | L'oiseau n'est pas bleu. | Est-ce que l'oiseau est bleu ? || The bird is blue. | The bird is not blue. | Is the bird blue?",
+        "Le cheval est marron. | Le cheval n'est pas marron. | Est-ce que le cheval est marron ? || The horse is brown. | The horse is not brown. | Is the horse brown?",
+        "Elle aime les lapins. | Elle n'aime pas les lapins. | Est-ce qu'elle aime les lapins ? || She likes rabbits. | She doesn't like rabbits. | Does she like rabbits?",
+        "Les vaches sont blanches. | Les vaches ne sont pas blanches. | Est-ce que les vaches sont blanches ? || The cows are white. | The cows are not white. | Are the cows white?",
+      ],
+    },
+    {
+      id: "food", name: "Food", icon: "🍎",
+      words: ["une pomme=an apple", "le pain=bread", "l'eau=water (fem.)", "le lait=milk", "le fromage=cheese",
+        "un œuf=an egg", "le riz=rice", "le poulet=chicken", "le thé=tea", "un gâteau=a cake"],
+      sentences: [
+        "J'aime le fromage. | Je n'aime pas le fromage. | Est-ce que tu aimes le fromage ? || I like cheese. | I don't like cheese. | Do you like cheese?",
+        "La pomme est rouge. | La pomme n'est pas rouge. | Est-ce que la pomme est rouge ? || The apple is red. | The apple is not red. | Is the apple red?",
+        "Il boit du lait. | Il ne boit pas de lait. | Est-ce qu'il boit du lait ? || He drinks milk. | He doesn't drink milk. | Does he drink milk?",
+        "Nous mangeons du riz. | Nous ne mangeons pas de riz. | Est-ce que vous mangez du riz ? || We eat rice. | We don't eat rice. | Do you eat rice?",
+        "Le gâteau est bon. | Le gâteau n'est pas bon. | Est-ce que le gâteau est bon ? || The cake is good. | The cake is not good. | Is the cake good?",
+        "Elle veut un œuf. | Elle ne veut pas d'œuf. | Est-ce qu'elle veut un œuf ? || She wants an egg. | She doesn't want an egg. | Does she want an egg?",
+      ],
+    },
+    {
+      id: "house", name: "Home", icon: "🏠",
+      words: ["une maison=a house", "une chambre=a bedroom", "une cuisine=a kitchen", "une salle de bain=a bathroom", "une porte=a door",
+        "une fenêtre=a window", "une table=a table", "une chaise=a chair", "un lit=a bed", "un jardin=a yard / a garden"],
+      sentences: [
+        "La cuisine est grande. | La cuisine n'est pas grande. | Est-ce que la cuisine est grande ? || The kitchen is big. | The kitchen is not big. | Is the kitchen big?",
+        "La porte est blanche. | La porte n'est pas blanche. | Est-ce que la porte est blanche ? || The door is white. | The door is not white. | Is the door white?",
+        "J'ai un jardin. | Je n'ai pas de jardin. | Est-ce que tu as un jardin ? || I have a yard. | I don't have a yard. | Do you have a yard?",
+        "Le chat est sur le lit. | Le chat n'est pas sur le lit. | Est-ce que le chat est sur le lit ? || The cat is on the bed. | The cat is not on the bed. | Is the cat on the bed?",
+        "Ma chambre est petite. | Ma chambre n'est pas petite. | Est-ce que ta chambre est petite ? || My bedroom is small. | My bedroom is not small. | Is your bedroom small?",
+        "Les chaises sont neuves. | Les chaises ne sont pas neuves. | Est-ce que les chaises sont neuves ? || The chairs are new. | The chairs are not new. | Are the chairs new?",
+      ],
+    },
+    {
+      id: "body", name: "Body", icon: "🖐️",
+      words: ["une tête=a head", "une main=a hand", "un œil=an eye (plural: les yeux)", "une oreille=an ear", "une bouche=a mouth",
+        "un nez=a nose", "un bras=an arm", "une jambe=a leg", "un pied=a foot", "les cheveux=hair"],
+      sentences: [
+        "Elle a les yeux bleus. | Elle n'a pas les yeux bleus. | Est-ce qu'elle a les yeux bleus ? || She has blue eyes. | She doesn't have blue eyes. | Does she have blue eyes?",
+        "Mes mains sont froides. | Mes mains ne sont pas froides. | Est-ce que tes mains sont froides ? || My hands are cold. | My hands are not cold. | Are your hands cold?",
+        "Il a les cheveux noirs. | Il n'a pas les cheveux noirs. | Est-ce qu'il a les cheveux noirs ? || He has black hair. | He doesn't have black hair. | Does he have black hair?",
+        "Le chien a de grandes oreilles. | Le chien n'a pas de grandes oreilles. | Est-ce que le chien a de grandes oreilles ? || The dog has big ears. | The dog doesn't have big ears. | Does the dog have big ears?",
+        "Mon pied est petit. | Mon pied n'est pas petit. | Est-ce que ton pied est petit ? || My foot is small. | My foot is not small. | Is your foot small?",
+        "Le cheval a de longues jambes. | Le cheval n'a pas de longues jambes. | Est-ce que le cheval a de longues jambes ? || The horse has long legs. | The horse doesn't have long legs. | Does the horse have long legs?",
+      ],
+    },
+    {
+      id: "clothes", name: "Clothes", icon: "👕",
+      words: ["une chemise=a shirt", "une chaussure=a shoe", "un chapeau=a hat", "une robe=a dress", "un manteau=a coat",
+        "un pantalon=pants", "une jupe=a skirt", "une chaussette=a sock", "une veste=a jacket", "une écharpe=a scarf"],
+      sentences: [
+        "Mon manteau est noir. | Mon manteau n'est pas noir. | Est-ce que ton manteau est noir ? || My coat is black. | My coat is not black. | Is your coat black?",
+        "Elle porte une robe rouge. | Elle ne porte pas de robe rouge. | Est-ce qu'elle porte une robe rouge ? || She's wearing a red dress. | She's not wearing a red dress. | Is she wearing a red dress?",
+        "Je veux de nouvelles chaussures. | Je ne veux pas de nouvelles chaussures. | Est-ce que tu veux de nouvelles chaussures ? || I want new shoes. | I don't want new shoes. | Do you want new shoes?",
+        "Le chapeau est grand. | Le chapeau n'est pas grand. | Est-ce que le chapeau est grand ? || The hat is big. | The hat is not big. | Is the hat big?",
+        "Il a une veste bleue. | Il n'a pas de veste bleue. | Est-ce qu'il a une veste bleue ? || He has a blue jacket. | He doesn't have a blue jacket. | Does he have a blue jacket?",
+        "Mes chaussettes sont vertes. | Mes chaussettes ne sont pas vertes. | Est-ce que tes chaussettes sont vertes ? || My socks are green. | My socks are not green. | Are your socks green?",
+      ],
+    },
+  ],
+
+  // Grammar lessons (written in American English)
+  skills: {
+    spell: { name: "The Quill", icon: "✍️", lesson: [
+      "Recognizing a word is good. <b>Writing</b> it is what makes it stick.",
+      "On every brick, you can add the <b>✍️ Spelling</b> upgrade: you'll type the French words yourself.",
+      "French loves accents — <b>é è ê à ç</b>… and they count! Nouns come with their article: <b>un</b> chat (masculine), <b>une</b> maison (feminine). Always learn them together.",
+    ] },
+    aff: { name: "Affirmative sentences", icon: "✅", lesson: [
+      "A simple French sentence uses the same order as English: <b>Subject + Verb + Complement</b>.<br><i>Le ciel est bleu.</i> — The sky is blue.",
+      "<b>être</b> (to be): <b>je suis</b> · <b>tu es</b> · <b>il / elle est</b> · <b>nous sommes</b> · <b>vous êtes</b> · <b>ils / elles sont</b><br><b>avoir</b> (to have): <b>j'ai</b> · <b>tu as</b> · <b>il a</b> · <b>nous avons</b> · <b>vous avez</b> · <b>ils ont</b>",
+      "Every noun is <b>masculine or feminine</b>: <b>le / un</b> chat, <b>la / une</b> maison. Adjectives agree: <i>le sac est vert</i> → <i>l'herbe est vert<b>e</b></i>.<br>Before a vowel, <b>je → j'</b> and <b>le / la → l'</b>: <i>j'aime, l'homme</i>.",
+    ] },
+    neg: { name: "Negation", icon: "🚫", lesson: [
+      "Wrap the verb with <b>ne … pas</b>:<br><i>Je suis désolé → Je <b>ne</b> suis <b>pas</b> désolé.</i>",
+      "Before a vowel, <b>ne → n'</b>:<br><i>J'aime le thé → Je <b>n'</b>aime <b>pas</b> le thé.</i>",
+      "After the negation, <b>un / une / du / de la → de</b> (or <b>d'</b>):<br><i>J'ai un chien → Je n'ai pas <b>de</b> chien.</i><br><i>Tu veux de l'eau → Tu ne veux pas <b>d'</b>eau.</i><br>(Not with <b>être</b>: <i>Ce n'est pas un chien.</i>)",
+    ] },
+    q: { name: "Questions", icon: "❓", lesson: [
+      "The easiest way: put <b>Est-ce que</b> at the start of the sentence:<br><i>Tu aimes le thé → <b>Est-ce que</b> tu aimes le thé ?</i>",
+      "Before a vowel, <b>que → qu'</b>:<br><i>Il est ici → <b>Est-ce qu'</b>il est ici ?</i>",
+      "Nothing else changes — same word order! In French, put a <b>space before the ?</b><br>(In casual speech you'll also hear just a rising tone: <i>Tu aimes le thé ?</i>)",
+    ] },
+  },
+
+  future: [
+    { name: "Passé composé", icon: "⏪" },
+    { name: "Futur proche", icon: "⏩" },
+    { name: "Imparfait", icon: "⏳" },
+  ],
+
+  ranks: [
+    [0, "Lost tourist"], [30, "Curious"], [90, "Apprentice"], [200, "Babbler"],
+    [400, "Traveler"], [700, "Getting by"], [1100, "Chatterbox"], [1700, "Francophile"],
+    [2500, "Almost bilingual"], [3600, "Parisian at heart"],
+  ],
+};
