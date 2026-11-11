@@ -763,3 +763,6 @@ details.p-section summary h4 { display: inline; }
 .heard-exp .miss { color: var(--bad); text-decoration: underline wavy; font-weight: 700; }
 .mic-btn.wait { border-color: var(--gold); opacity: .8; animation: micWait 1s ease-in-out infinite; }
 @keyframes micWait { 50% { transform: scale(.94); } }
+
+.nomic-row { display: flex; justify-content: flex-start; margin: -4px 0 8px; }
+.nomic-btn { padding: 6px 12px; font-size: 13px; min-height: 0; }

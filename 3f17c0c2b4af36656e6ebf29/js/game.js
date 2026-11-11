@@ -894,8 +894,9 @@ function genSentence(b, aid, used, st) {
   return { kind: "tiles", tag, instr: L("qTranslate"), prompt: nat, sentence: true, target, bank, solution: tg, sayAfter: tg };
 }
 
-// 🎤 Oral : un mélange de phrases du quotidien (½), de phrases de la brique (¼) et de mots (¼).
-// (Arrive juste après ✍️ : tant que ✅ 🚫 ❓ ne sont pas appris, seulement des phrases du quotidien et des mots.)
+// 🎤 Oral : des PHRASES seulement (les mots seuls sont mal captés par les micros des téléphones).
+// Phrases du quotidien (≈ 2/3) et phrases de la brique (≈ 1/3, aux formes ✅ 🚫 ❓ déjà apprises).
+// Si tout a déjà servi récemment : phrases du quotidien des autres briques débloquées.
 // Jamais deux fois la même chose dans une séance, et on évite ce qui est sorti aux dernières séances.
 const ORAL_RECENT = 20;
 function genOral(b, used) {
@@ -905,11 +906,11 @@ function genOral(b, used) {
     // phrases de la brique : seulement aux formes (✅ 🚫 ❓) déjà apprises sur cette brique
     s: b.s.flatMap((x, k) => x.tg.map((t, f) => ({ key: `s${k}.${f}`, base: "s" + k, f, tg: t, nat: x.nat[f], sentence: true })))
       .filter((x) => bs.attrs[["aff", "neg", "q"][x.f]] && bs.attrs[["aff", "neg", "q"][x.f]].learned),
-    w: b.w.map((x, k) => ({ key: "w" + k, tg: x.tg, nat: x.nat, alts: x.alts, wi: k })),
+    // renfort : phrases du quotidien des autres briques déjà débloquées
+    x: BRICKS.filter((o) => o.id !== b.id && S.bricks[o.id]).flatMap((o) => o.o.map((x, k) => ({ key: `x${o.id}.${k}`, tg: x.tg, nat: x.nat, sentence: true }))),
   };
-  const r = Math.random();
-  const want = !pools.o.length ? (r < 0.4 || !pools.s.length ? "w" : "s") : r < 0.5 ? "o" : r < 0.75 && pools.s.length ? "s" : r < 0.75 ? "o" : "w";
-  const order = [want, ...["o", "s", "w"].filter((k) => k !== want)];
+  const want = pools.s.length && Math.random() < 0.35 ? "s" : "o";
+  const order = [want, ...["o", "s", "x"].filter((k) => k !== want)];
   let item = null;
   for (const avoidRecent of [true, false]) {
     for (const k of order) {
@@ -919,7 +920,7 @@ function genOral(b, used) {
     }
     if (item) break;
   }
-  if (!item) { used.clear(); item = pick(pools[want].length ? pools[want] : pools.w); }
+  if (!item) { used.clear(); item = pick(pools.o.length ? pools.o : pools.s); }
   used.add(item.key); if (item.base) used.add(item.base);
   bs.oralRecent = [...(bs.oralRecent || []).filter((k) => k !== item.key), item.key].slice(-ORAL_RECENT);
   return { kind: "speak", sentence: !!item.sentence, tag: L("tagOral"), instr: L(item.sentence ? "qSpeakSentence" : "qSpeakWord"),
@@ -1109,10 +1110,11 @@ function renderQ() {
   if (q.kind === "mcq") {
     body += `<div class="choices ${q.col ? "col" : ""}">${q.options.map((o, k) => `<button class="choice" data-c="${k}"><span class="k">${k + 1}</span><span>${o}</span></button>`).join("")}</div>`;
   } else if (q.kind === "speak") {
-    SES.mic = { tries: 0, best: null };
+    SES.mic = { tries: 0, best: null, shownAt: Date.now() };
+    body = `<div class="nomic-row"><button class="btn btn-ghost nomic-btn" data-nomic>${L("noMicNow")}</button></div>` + body;
     body += `<div class="mic-wrap"><button class="mic-btn" data-mic aria-label="${esc(L("micTap"))}">🎤</button>
       <div class="mic-status" id="mic-st">${L(q.sentence ? "micTap" : "micTapWord")}</div><div class="heard" id="heard"></div></div>`;
-    foot += `<button class="btn btn-ghost" data-nomic>${L("noMicNow")}</button><button class="btn btn-good btn-big hidden" data-keep>${L("keepAnswer")}</button>`;
+    foot += `<button class="btn btn-good btn-big hidden" data-keep>${L("keepAnswer")}</button>`;
   } else if (q.kind === "type" || q.kind === "write") {
     body += `<input class="type-in ${q.kind === "write" ? "write" : ""}" id="type-in" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="${esc(q.kind === "write" ? L("writePh") : L("typePh"))}" lang="${COURSE.target}">
       ${q.hint ? `<div class="hint">${q.hint}</div>` : ""}
@@ -1160,6 +1162,7 @@ function renderQ() {
 function bindMic(q) {
   const btn = $("#modal [data-mic]"), st = $("#mic-st"), heard = $("#heard"), keep = $("#modal [data-keep]");
   $("#modal [data-nomic]").onclick = () => {
+    if (Date.now() - SES.mic.shownAt < 900) return;     // double toucher trop rapide après « Continuer »
     stopListen();
     if (SES.boss) SES.firstTotal = Math.max(1, SES.firstTotal - SES.qs.slice(SES.i).filter((x) => x.kind === "speak").length);
     SES.noMic = true; SES.answered = true; nextQ();
