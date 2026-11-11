@@ -79,6 +79,7 @@ for (const c of Object.values(COURSES)) {
       const [a, n] = s.split("||");
       return { tg: a.split("|").map((x) => x.trim()), nat: n.split("|").map((x) => x.trim()) };
     });
+    b.o = (b.oral || []).map((s) => { const [a, n] = s.split("||"); return { tg: a.trim(), nat: n.trim() }; });
   });
   c.BR = Object.fromEntries(c.bricks.map((b) => [b.id, b]));
   c.SKILLS = SKILL_DEF.map((d) => ({ ...d, ...c.skills[d.id] }));
@@ -892,16 +893,32 @@ function genSentence(b, aid, used, st) {
   return { kind: "tiles", tag, instr: L("qTranslate"), prompt: nat, sentence: true, target, bank, solution: tg, sayAfter: tg };
 }
 
-// 🎤 Oral : lire à voix haute un mot (40 %) ou une phrase, à n'importe quelle forme
+// 🎤 Oral : un mélange de phrases du quotidien (½), de phrases de la brique (¼) et de mots (¼).
+// Jamais deux fois la même chose dans une séance, et on évite ce qui est sorti aux dernières séances.
+const ORAL_RECENT = 20;
 function genOral(b, used) {
-  if (Math.random() < 0.4 || !b.s.length) {
-    const i = pickWeighted(wordWeights(b), used), w = b.w[i];
-    return { kind: "speak", tag: L("tagOral"), instr: L("qSpeakWord"), prompt: w.tg, say: w.tg, sub: w.nat, subPlain: true,
-      accept: w.alts, solution: w.tg, wi: i };
+  const bs = S.bricks[b.id], recent = new Set(bs.oralRecent || []);
+  const pools = {
+    o: b.o.map((x, k) => ({ key: "o" + k, tg: x.tg, nat: x.nat, sentence: true })),
+    s: b.s.flatMap((x, k) => x.tg.map((t, f) => ({ key: `s${k}.${f}`, base: "s" + k, tg: t, nat: x.nat[f], sentence: true }))),
+    w: b.w.map((x, k) => ({ key: "w" + k, tg: x.tg, nat: x.nat, alts: x.alts, wi: k })),
+  };
+  const r = Math.random(), want = !pools.o.length ? (r < 0.4 ? "w" : "s") : r < 0.5 ? "o" : r < 0.75 ? "s" : "w";
+  const order = [want, ...["o", "s", "w"].filter((k) => k !== want)];
+  let item = null;
+  for (const avoidRecent of [true, false]) {
+    for (const k of order) {
+      // une même phrase de la brique ne revient pas sous une autre forme dans la séance
+      const c = pools[k].filter((x) => !used.has(x.key) && !(x.base && used.has(x.base)) && !(avoidRecent && recent.has(x.key)));
+      if (c.length) { item = pick(c); break; }
+    }
+    if (item) break;
   }
-  const sent = pick(b.s), f = Math.floor(Math.random() * 3), tg = sent.tg[f];
-  return { kind: "speak", sentence: true, tag: L("tagOral"), instr: L("qSpeakSentence"), prompt: tg, say: tg, sub: sent.nat[f], subPlain: true,
-    accept: [tg], solution: tg };
+  if (!item) { used.clear(); item = pick(pools[want].length ? pools[want] : pools.w); }
+  used.add(item.key); if (item.base) used.add(item.base);
+  bs.oralRecent = [...(bs.oralRecent || []).filter((k) => k !== item.key), item.key].slice(-ORAL_RECENT);
+  return { kind: "speak", sentence: !!item.sentence, tag: L("tagOral"), instr: L(item.sentence ? "qSpeakSentence" : "qSpeakWord"),
+    prompt: item.tg, say: item.tg, sub: item.nat, subPlain: true, accept: item.alts || [item.tg], solution: item.tg, wi: item.wi };
 }
 
 function genQuestion(t, used) {
