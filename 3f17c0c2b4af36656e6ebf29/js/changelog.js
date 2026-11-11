@@ -5,6 +5,23 @@
 // =====================================================================
 const CHANGELOG = [
   {
+    date: "2026-11-11", icon: "🎤",
+    fr: { title: "Parle, BRICKS t'écoute", items: [
+      "Nouvel attribut <b>🎤 Oral</b>, après ❓ : lis les mots et les phrases à voix haute.",
+      "Le micro vérifie que tu as été compris et montre en rouge les mots qu'il n'a pas reconnus.",
+      "3 essais par question ; une prononciation parfaite valide tout de suite.",
+      "Pas possible de parler ? « 🙊 Pas maintenant » saute l'exercice sans compter d'erreur.",
+      "Fonctionne avec Chrome, Edge et Safari (le navigateur demande l'accès au micro la première fois).",
+    ] },
+    en: { title: "Speak, BRICKS is listening", items: [
+      "New <b>🎤 Speaking</b> upgrade, after ❓: read the words and sentences out loud.",
+      "The microphone checks you were understood and shows in red the words it didn't recognize.",
+      "3 tries per question; a perfect answer passes right away.",
+      "Can't speak right now? “🙊 Not now” skips the exercise without counting a mistake.",
+      "Works in Chrome, Edge and Safari (the browser asks for microphone access the first time).",
+    ] },
+  },
+  {
     date: "2026-11-11", icon: "🔁",
     fr: { title: "Le rattrapage peut sauver une leçon", items: [
       "Les questions ratées, reposées à la fin de la leçon, comptent maintenant pour valider une première leçon.",
