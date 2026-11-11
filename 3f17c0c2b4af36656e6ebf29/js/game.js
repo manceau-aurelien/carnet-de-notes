@@ -984,7 +984,12 @@ function listenOnce(onPartial, onDone, onReady = () => {}) {
     onPartial(partial);
   };
   r.onerror = (e) => { err = e.error; };
-  r.onend = () => { clearTimeout(fallback); if (REC !== r) return; REC = null; onDone(alts || (partial ? [partial] : null), alts || partial ? null : err || "no-speech"); };
+  r.onend = () => {
+    clearTimeout(fallback); if (REC !== r) return; REC = null;
+    let got = (alts || [partial]).filter((x) => x && x.trim());
+    if (!got.length && partial.trim()) got = [partial];
+    onDone(got.length ? got : null, got.length ? null : err || "no-speech");
+  };
   try { r.start(); } catch (e) { REC = null; onDone(null, "start"); }
 }
 
@@ -1002,9 +1007,35 @@ function speechTokens(s) {
   const nums = NUM_WORDS[COURSE.target].map((w) => noAcc(w).replace(/-/g, " "));
   return t.split(/\s+/).filter(Boolean).flatMap((w) => (/^\d+$/.test(w) && nums[+w] ? nums[+w].split(" ") : [w]));
 }
+// Homophones : même son, autre orthographe. Si le micro écrit « blew » pour « blue »,
+// c'est que le mot a été bien prononcé. (Clés et valeurs sans accents, en minuscules.)
+const HOMOPHONES = {
+  en: {
+    i: ["eye", "aye", "hi"], eye: ["i", "aye"], you: ["u", "ewe", "yew"], he: ["hee"], we: ["wee", "oui", "whee"],
+    am: ["m", "um", "em"], is: ["his", "iz"], are: ["r", "our", "ah"], they: ["thay"], it: ["itt"],
+    hello: ["hallo", "hullo"], bye: ["by", "buy", "bi"], goodbye: ["good bye"], no: ["know"], please: ["pleas"],
+    red: ["read"], blue: ["blew"], white: ["wight"], grey: ["gray"],
+    one: ["won"], two: ["to", "too"], four: ["for", "fore"], eight: ["ate"], nine: ["nein"],
+    son: ["sun"], see: ["sea", "c"], read: ["red", "reed"], new: ["knew", "gnu"],
+    horse: ["hoarse"], bread: ["bred"], tea: ["tee", "t"], nose: ["knows"], hair: ["hare"], shoe: ["shoo"],
+  },
+  fr: {
+    tu: ["tue", "tus"], il: ["ile", "ils"], ils: ["il", "ile"], elle: ["aile", "elles", "l"], elles: ["elle", "aile"],
+    nous: ["noue"], vous: ["voue"], suis: ["suit", "suie"], est: ["et", "ai", "es", "e"], sont: ["son", "sons"],
+    non: ["nom"], vert: ["verre", "vers", "ver", "verts"], bleu: ["bleus"], noir: ["noire"], rose: ["roses"],
+    un: ["hein", "1"], sept: ["cette", "set", "sete"], dix: ["dis", "dit"], cinq: ["saint", "sain", "sein"],
+    mere: ["mer", "maire"], pere: ["paire", "pair", "perd"], fils: ["fil"],
+    aimer: ["aime", "aimez", "aimait"], adorer: ["adore", "adorez"], manger: ["mange", "mangez", "mangeait"],
+    aller: ["allez", "alle", "allait"], jouer: ["joue", "jouez", "jouait"], voir: ["voire"],
+    chaud: ["show", "chaux"], bon: ["bond"], chat: ["chas", "shah", "sa"], souris: ["sourit"],
+    pain: ["pin", "peint"], lait: ["les", "laid", "laie", "lai"], riz: ["ri", "rit"], the: ["t", "te"],
+    lit: ["lie", "lis", "li"], main: ["mains", "maint"], nez: ["ne", "nait"], pied: ["pieds"], tete: ["tetes"],
+  },
+};
 // Nombre de mots attendus retrouvés dans l'ordre (petites différences tolérées sur les mots longs)
 function wordsFound(exp, got) {
-  const same = (a, b) => a === b || (a.length >= 5 && lev(a, b) <= 1);
+  const homo = HOMOPHONES[COURSE.target] || {};
+  const same = (a, b) => a === b || (a.length >= 5 && lev(a, b) <= 1) || (homo[a] || []).includes(b) || (homo[b] || []).includes(a);
   const m = exp.map(() => Array(got.length + 1).fill(0));
   const at = (i, j) => (i < 0 ? 0 : m[i][j]);
   for (let i = 0; i < exp.length; i++)
@@ -1026,7 +1057,13 @@ function gradeSpeech(heard, accept) {
   for (const h of heard) {
     const got = speechTokens(h);
     for (const a of forms) {
-      const exp = speechTokens(a), { n, miss } = wordsFound(exp, got);
+      const exp = speechTokens(a);
+      // « good bye » pour « goodbye », « grand mère » pour « grand-mère » : mêmes lettres, découpage différent
+      if (exp.join("") === got.join("") || (exp.length === 1 && got.join("").includes(exp[0]) && got.join("").replace(new RegExp(exp[0], "g"), "") === "")) {
+        if (1 > best.ratio) best = { ratio: 1, heard: h, exp: a, miss: new Set() };
+        continue;
+      }
+      const { n, miss } = wordsFound(exp, got);
       const ratio = exp.length ? n / exp.length : 0;
       if (ratio > best.ratio) best = { ratio, heard: h, exp: a, miss };
     }
@@ -1074,7 +1111,7 @@ function renderQ() {
   } else if (q.kind === "speak") {
     SES.mic = { tries: 0, best: null };
     body += `<div class="mic-wrap"><button class="mic-btn" data-mic aria-label="${esc(L("micTap"))}">🎤</button>
-      <div class="mic-status" id="mic-st">${L("micTap")}</div><div class="heard" id="heard"></div></div>`;
+      <div class="mic-status" id="mic-st">${L(q.sentence ? "micTap" : "micTapWord")}</div><div class="heard" id="heard"></div></div>`;
     foot += `<button class="btn btn-ghost" data-nomic>${L("noMicNow")}</button><button class="btn btn-good btn-big hidden" data-keep>${L("keepAnswer")}</button>`;
   } else if (q.kind === "type" || q.kind === "write") {
     body += `<input class="type-in ${q.kind === "write" ? "write" : ""}" id="type-in" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="${esc(q.kind === "write" ? L("writePh") : L("typePh"))}" lang="${COURSE.target}">
@@ -1164,7 +1201,8 @@ function bindMic(q) {
       btn.classList.remove("on", "wait");
       if (!SES || SES.answered || SES.qs[SES.i] !== q) return;
       if (!alts) {
-        st.innerHTML = L(err === "not-allowed" || err === "service-not-allowed" ? "micDenied" : err === "network" ? "micNetwork" : "micNothing");
+        st.innerHTML = err === "not-allowed" || err === "service-not-allowed" ? L("micDenied") : err === "network" ? L("micNetwork")
+          : q.sentence ? L("micNothing") : L("micNothingWord", esc(splitArticle(q.prompt)[1]));
         return;
       }
       const g = gradeSpeech(alts, q.accept);
