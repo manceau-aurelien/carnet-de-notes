@@ -764,5 +764,10 @@ details.p-section summary h4 { display: inline; }
 .mic-btn.wait { border-color: var(--gold); opacity: .8; animation: micWait 1s ease-in-out infinite; }
 @keyframes micWait { 50% { transform: scale(.94); } }
 
-.nomic-row { display: flex; justify-content: flex-start; margin: -4px 0 8px; }
-.nomic-btn { padding: 6px 12px; font-size: 13px; min-height: 0; }
+/* « Pas maintenant » : en bas à gauche, même taille que le bouton de droite */
+.m-foot .nomic-foot { min-width: 200px; }
+@media (max-width: 760px) {
+  .m-foot .nomic-foot { flex: 0 0 calc(50% - 5px); min-width: 0; }
+  .m-foot .nomic-foot, .m-foot [data-keep] { white-space: normal; line-height: 1.2; padding: 12px 10px; font-size: 15px; }
+  .m-foot [data-keep] { flex: 1 1 0; min-width: 0; }
+}

@@ -9,12 +9,12 @@ const CHANGELOG = [
     fr: { title: "Un oral plus fiable", items: [
       "L'oral ne propose plus que des <b>phrases</b> : les mots tout seuls étaient trop mal captés par les micros des téléphones.",
       "Le micro accepte les mots qui se prononcent pareil (par exemple « two » et « to ») : ta prononciation était bonne.",
-      "Le bouton « 🙊 Pas maintenant » est passé en haut à gauche, pour ne plus le toucher par erreur en enchaînant les questions.",
+      "Le bouton « 🙊 Pas maintenant » est passé en bas à gauche, et il ignore les touchers trop rapides : plus de risque de le toucher par erreur en enchaînant les questions.",
     ] },
     en: { title: "More reliable speaking", items: [
       "Speaking exercises now only use <b>sentences</b>: single words were too often missed by phone microphones.",
       "The microphone accepts words that sound the same (for example “vert” and “verre”): your pronunciation was right.",
-      "The “🙊 Not now” button moved to the top left, so you don't tap it by mistake when moving through questions.",
+      "The “🙊 Not now” button moved to the bottom left and ignores taps that come too fast: no more tapping it by mistake when moving through questions.",
     ] },
   },
   {

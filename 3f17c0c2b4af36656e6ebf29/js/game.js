@@ -1111,10 +1111,11 @@ function renderQ() {
     body += `<div class="choices ${q.col ? "col" : ""}">${q.options.map((o, k) => `<button class="choice" data-c="${k}"><span class="k">${k + 1}</span><span>${o}</span></button>`).join("")}</div>`;
   } else if (q.kind === "speak") {
     SES.mic = { tries: 0, best: null, shownAt: Date.now() };
-    body = `<div class="nomic-row"><button class="btn btn-ghost nomic-btn" data-nomic>${L("noMicNow")}</button></div>` + body;
     body += `<div class="mic-wrap"><button class="mic-btn" data-mic aria-label="${esc(L("micTap"))}">🎤</button>
       <div class="mic-status" id="mic-st">${L(q.sentence ? "micTap" : "micTapWord")}</div><div class="heard" id="heard"></div></div>`;
-    foot += `<button class="btn btn-good btn-big hidden" data-keep>${L("keepAnswer")}</button>`;
+    // « Pas maintenant » en bas à gauche, « Garder cette réponse » en bas à droite (même taille)
+    foot = `<button class="btn btn-big nomic-foot" data-nomic>${L("noMicNow")}</button>` + foot
+      + `<button class="btn btn-good btn-big hidden" data-keep>${L("keepAnswer")}</button>`;
   } else if (q.kind === "type" || q.kind === "write") {
     body += `<input class="type-in ${q.kind === "write" ? "write" : ""}" id="type-in" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="${esc(q.kind === "write" ? L("writePh") : L("typePh"))}" lang="${COURSE.target}">
       ${q.hint ? `<div class="hint">${q.hint}</div>` : ""}
