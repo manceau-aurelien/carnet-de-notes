@@ -237,6 +237,9 @@ function attrLockReason(b, at) {
   }
   return null;
 }
+// Première leçon d'un attribut : 70 % au 1er essai, puis 80 % aux essais suivants
+const PASS_FIRST = 0.7, PASS_RETRY = 0.8;
+const passNeed = (a) => (a && a.tries ? PASS_RETRY : PASS_FIRST);
 function newBrickState(b) { return { attrs: { vocab: { learned: false } }, werr: Array(b.w.length).fill(1), isNew: true }; }
 function spend(n) { if (S.savoir < n) return false; S.savoir -= n; return true; }
 
@@ -490,7 +493,8 @@ function brickPanel(b) {
 
   const sol = brickSolidity(b);
   const top = !bs.attrs.vocab.learned
-    ? `<button class="btn btn-gold btn-big full" data-act="learn-vocab">${L("discover10")}</button>`
+    ? `<button class="btn btn-gold btn-big full" data-act="learn-vocab">${bs.attrs.vocab.tries ? L("retryLesson") : L("discover10")}</button>
+       <div class="need-hint center">${L("needPct", Math.round(passNeed(bs.attrs.vocab) * 100), bs.attrs.vocab.tries || 0)}</div>`
     : `<div class="solid"><div class="big" style="color:${retColor(sol)}">${Math.round(sol * 100)}%</div>
         <div><div>${L("solidity")}</div><div class="p-sub">${L("production", (brickRate(b) * 60).toFixed(1))}</div></div></div>
        <button class="btn btn-good btn-big full" data-act="review-brick">${L("reviewBrick")}</button>`;
@@ -506,7 +510,8 @@ function brickPanel(b) {
     }
     if (!a.learned) {
       return `<div class="attr">${topRow(`<span class="newbadge static">${L("toLearnBadge")}</span>`)}<div class="attr-desc">${attrDesc(at.id)}</div>
-        <div class="attr-actions"><span></span><button class="btn btn-gold" data-act="learn-attr" data-attr="${at.id}">${L("firstLesson")}</button></div></div>`;
+        <div class="need-hint">${L("needPct", Math.round(passNeed(a) * 100), a.tries || 0)}</div>
+        <div class="attr-actions"><span></span><button class="btn btn-gold" data-act="learn-attr" data-attr="${at.id}">${a.tries ? L("retryLesson") : L("firstLesson")}</button></div></div>`;
     }
     const r = ret(a), left = a.last + a.hl - Date.now();
     const st = stars(a), pct = Math.round(r * 100);
@@ -1085,6 +1090,12 @@ function finishSession() {
   for (const key in SES.per) {
     const p = SES.per[key]; if (!p.tot) continue;
     const a = S.bricks[p.bid].attrs[p.aid], score = p.ok / p.tot;
+    if (!a.learned) {                         // première leçon : il faut atteindre le seuil
+      const need = passNeed(a);
+      a.tries = (a.tries || 0) + 1;
+      if (score + 1e-9 < need) { p.failed = { need, next: passNeed(a), score }; rows.push({ p, a, st: 0 }); continue; }
+      delete a.tries;
+    }
     applyReview(a, score);
     const st = stars(a);
     if (st > p.starsBefore) toast(L("starUp", BR[p.bid].icon, attrName(p.aid), st));
@@ -1100,9 +1111,15 @@ function finishSession() {
   save();
   SES = null;
 
-  const face = pct === 100 ? "🏆" : pct >= 80 ? "🎉" : pct >= 60 ? "👍" : "💪";
+  const failed = rows.filter((r) => r.p.failed);
+  const face = failed.length ? "💪" : pct === 100 ? "🏆" : pct >= 80 ? "🎉" : pct >= 60 ? "👍" : "💪";
   const rowsHtml = rows.map(({ p, a, st }) => {
     const b = BR[p.bid], at = AT[p.aid];
+    if (p.failed) {
+      return `<div class="res-row failed"><span class="res-ico">${b.icon}</span><div class="r-name">${at.icon} ${attrName(p.aid)} <span class="p-sub">· ${b.name}</span>
+        <div class="r-hl">${L("notValidated", Math.round(p.failed.need * 100))}</div></div>
+        <div class="r-right"><div><b style="color:var(--bad)">${Math.round(p.failed.score * 100)}%</b> / ${Math.round(p.failed.need * 100)}%</div></div></div>`;
+    }
     const before = p.wasLearned ? `${Math.round(p.rBefore * 100)}%` : L("isNew");
     const trend = !p.wasLearned ? "" : a.hl >= p.hlBefore ? `<span class="up">▲</span>` : `<span class="down">▼</span>`;
     return `<div class="res-row"><span class="res-ico">${b.icon}</span><div class="r-name">${at.icon} ${attrName(p.aid)} <span class="p-sub">· ${b.name}</span>
@@ -1113,7 +1130,7 @@ function finishSession() {
     <div class="m-body"><div class="res-head"><div class="res-face">${face}</div><div class="res-score">${pct}%</div>
       <div class="res-sub">${L("firstTry", maxCombo)}</div>
       <div class="res-gain">+${gained} 💡${bonus ? ` <span class="p-sub">${L("perfectBonus", bonus)}</span>` : ""}</div></div>
-      ${rowsHtml}<div class="p-sub res-tip">${pct < 70 ? L("lowScore") : L("goodScore")}</div></div>
+      ${rowsHtml}<div class="p-sub res-tip">${failed.length ? L("firstFailTip", Math.round(failed[0].p.failed.next * 100)) : pct < 70 ? L("lowScore") : L("goodScore")}</div></div>
     <div class="m-foot"><div class="fb"></div><button class="btn" data-again>${L("again")}</button><button class="btn btn-gold btn-big" data-close>${L("cont")}</button></div>`, "session");
   $("#modal [data-x]").onclick = closeModal;
   $("#modal [data-close]").onclick = closeModal;

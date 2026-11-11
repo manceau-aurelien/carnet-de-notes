@@ -5,6 +5,21 @@
 // =====================================================================
 const CHANGELOG = [
   {
+    date: "2026-11-11", icon: "🎯",
+    fr: { title: "Une première leçon se mérite", items: [
+      "Pour valider une brique ou un attribut la première fois, il faut au moins <b>70 %</b> de bonnes réponses.",
+      "Raté ? Le Savoir gagné est conservé, mais il faut recommencer, et cette fois atteindre au moins <b>80 %</b>.",
+      "Tant que ce n'est pas validé, l'attribut suivant reste verrouillé.",
+      "Le seuil à atteindre est affiché sur la fiche, juste au-dessus du bouton.",
+    ] },
+    en: { title: "A first lesson must be earned", items: [
+      "To pass a brick or an upgrade the first time, you need at least <b>70%</b> correct answers.",
+      "Failed? You keep the Knowledge you earned, but you must try again, and reach at least <b>80%</b> this time.",
+      "Until it's passed, the next upgrade stays locked.",
+      "The score to reach is shown on the card, just above the button.",
+    ] },
+  },
+  {
     date: "2026-11-11", icon: "🧠",
     fr: { title: "Mémoire temporaire et mémoire profonde", items: [
       "La barre d'un attribut s'appelle maintenant la <b>mémoire temporaire</b> : ce que tu as en tête en ce moment.",

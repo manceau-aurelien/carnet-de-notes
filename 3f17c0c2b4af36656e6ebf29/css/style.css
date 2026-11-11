@@ -729,3 +729,9 @@ details.p-section summary h4 { display: inline; }
 .mem-table td { padding: 3px 18px 3px 0; border-top: 1px solid var(--line); }
 .mem-table tr.on td { color: var(--gold); font-weight: 700; }
 @media (pointer: coarse) { .mem-i { width: 24px; height: 24px; font-size: 13px; } }
+
+/* ---------- Seuil de la première leçon ---------- */
+.need-hint { font-size: 12px; color: var(--muted); margin-top: 6px; }
+.need-hint b { color: var(--gold); }
+.need-hint.center { text-align: center; margin: 8px 0 4px; }
+.res-row.failed { border: 1px solid rgba(255, 93, 115, .45); }
