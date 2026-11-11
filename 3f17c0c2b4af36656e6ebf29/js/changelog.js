@@ -5,6 +5,21 @@
 // =====================================================================
 const CHANGELOG = [
   {
+    date: "2026-11-11", icon: "🧠",
+    fr: { title: "Mémoire temporaire et mémoire profonde", items: [
+      "La barre d'un attribut s'appelle maintenant la <b>mémoire temporaire</b> : ce que tu as en tête en ce moment.",
+      "Les étoiles deviennent la <b>mémoire profonde</b> : combien de temps la connaissance tient.",
+      "Sous la production 💡, le calcul « Mt × Mp » montre d'où vient ce que rapporte chaque attribut.",
+      "Un petit <b>i</b> ouvre une explication complète, avec l'état de l'attribut et ce qu'il faut pour la prochaine étoile.",
+    ] },
+    en: { title: "Short-term and deep memory", items: [
+      "An upgrade's bar is now called <b>short-term memory</b>: what you have in mind right now.",
+      "Stars are now <b>deep memory</b>: how long the knowledge lasts.",
+      "Below the 💡 production, “ST × DM” shows where each upgrade's earnings come from.",
+      "A small <b>i</b> opens a full explanation, with the upgrade's current state and what the next star needs.",
+    ] },
+  },
+  {
     date: "2026-11-11", icon: "📲",
     fr: { title: "BRICKS s'installe comme une application", items: [
       "Un bouton « 📲 Installer l'application » apparaît sur l'écran de choix du profil.",

@@ -114,8 +114,9 @@ function fmtDur(ms, lang = UI) {
   const d = STR[lang];
   if (ms < MIN) return d.durLess;
   if (ms < HOUR) return Math.round(ms / MIN) + " " + d.durMin;
-  if (ms < DAY) return (ms / HOUR).toFixed(ms < 10 * HOUR ? 1 : 0).replace(".0", "") + " " + d.durH;
-  return (ms / DAY).toFixed(ms < 10 * DAY ? 1 : 0).replace(".0", "") + " " + d.durD;
+  const num = (x, dec) => { const t = x.toFixed(dec).replace(".0", ""); return lang === "fr" ? t.replace(".", ",") : t; };
+  if (ms < DAY) return num(ms / HOUR, ms < 10 * HOUR ? 1 : 0) + " " + d.durH;
+  return num(ms / DAY, ms < 10 * DAY ? 1 : 0) + " " + d.durD;
 }
 function retColor(r) {
   if (r >= 0.75) return "var(--good)";
@@ -508,10 +509,13 @@ function brickPanel(b) {
         <div class="attr-actions"><span></span><button class="btn btn-gold" data-act="learn-attr" data-attr="${at.id}">${L("firstLesson")}</button></div></div>`;
     }
     const r = ret(a), left = a.last + a.hl - Date.now();
-    return `<div class="attr">${topRow(`<span class="stars" title="${esc(L("starsTip"))}">${starStr(stars(a))}</span>`)}
+    const st = stars(a), pct = Math.round(r * 100);
+    return `<div class="attr">${topRow(`<span class="deep" title="${esc(L("starsTip"))}"><small>${L("deepMem")}</small><span class="stars">${starStr(st)}</span></span>`)}
       <div class="bar"><div style="width:${r * 100}%;background:${retColor(r)}"></div></div>
-      <div class="attr-info"><span>${L("strengthPct", Math.round(r * 100))}</span><span>${left > 0 ? L("erodesIn", fmtDur(left)) : L("eroded")}</span></div>
-      <div class="attr-actions"><span class="p-sub">💡 +${(attrBaseRate(b, at.id, a) * r * 60).toFixed(1)} /min</span>
+      <div class="attr-info"><span>${L("strengthPct", pct)}</span><span>${left > 0 ? L("erodesIn", fmtDur(left)) : L("eroded")}</span></div>
+      <div class="attr-actions"><div class="prod"><span class="p-sub">💡 +${(attrBaseRate(b, at.id, a) * r * 60).toFixed(1)} /min</span>
+          <span class="prod-calc">${L("memCalc", pct, `<span class="stars sm">${"★".repeat(st) || "–"}</span>`)}
+          <button class="mem-i" data-act="mem-info" data-attr="${at.id}" title="${esc(L("memInfoTip"))}" aria-label="${esc(L("memInfoTip"))}">i</button></span></div>
         <button class="btn" data-act="train" data-attr="${at.id}">${L("train")}</button></div></div>`;
   }).join("");
 
@@ -520,6 +524,26 @@ function brickPanel(b) {
     : hidden;
   return head + top + `<div class="p-section"><h4>${L("attrs")}</h4>${attrs}</div>
     <div class="p-section"><h4>${L("words")}</h4><div class="words">${words}</div></div>`;
+}
+
+// Fenêtre « Les deux mémoires » (le petit i sous la production)
+function memoryInfoModal(b, aid) {
+  const a = S.bricks[b.id].attrs[aid], st = stars(a), r = ret(a);
+  const tbl = (head, rows) => `<table class="mem-table"><tr><th>${head[0]}</th><th>${head[1]}</th></tr>${rows.map(([x, y, on]) =>
+    `<tr class="${on ? "on" : ""}"><td>${x}</td><td>${y}</td></tr>`).join("")}</table>`;
+  const starRows = STAR_HL.map((h, i) => [`<span class="stars">${"★".repeat(i + 1)}</span>`, fmtDur(h), i + 1 === st]);
+  const multRows = [[1, "1,05"], [0.5, "1,95"], [0, "2,85"]].map(([R, m]) =>
+    [`${Math.round(R * 100)} %`, "×" + (UI === "fr" ? m : m.replace(",", ".")), false]);
+  const next = STAR_HL[st];
+  openModal(`<div class="m-head"><div class="m-tag grow">${L("memTitle")}</div><button class="m-close" data-x>✕</button></div>
+    <div class="m-body mem-info">
+      <div class="mem-this">${L("memThis", AT[aid].icon, attrName(aid), Math.round(r * 100), `<span class="stars">${"★".repeat(st) || "–"}</span>`, fmtDur(a.hl))}
+        <div class="p-sub">${next ? L("memNext", fmtDur(next)) : L("memMax")}</div></div>
+      ${L("memBody", tbl(L("memStarsHead"), starRows), tbl(L("memMultHead"), multRows))}
+    </div>
+    <div class="m-foot"><div class="fb"></div><button class="btn btn-gold btn-big" data-x2>${L("gotIt")}</button></div>`);
+  $("#modal [data-x]").onclick = closeModal; $("#modal [data-x2]").onclick = closeModal;
+  KEY = (e) => { if (e.key === "Enter") closeModal(); };
 }
 
 function renderAll() { if (!S) return; renderTop(); renderSkills(); renderTree(); renderPanel(); }
@@ -1328,6 +1352,7 @@ function bind() {
     else if (act === "learn-attr") openAttrIntro(b, AT[el.dataset.attr]);
     else if (act === "train") startSession([{ bid: b.id, aid: el.dataset.attr, n: 8 }], { title: L("practiceTitle", attrName(el.dataset.attr)) });
     else if (act === "say") speak(b.w[+el.dataset.i].tg);
+    else if (act === "mem-info") memoryInfoModal(b, el.dataset.attr);
   });
   // Écran des profils
   $("#screen").addEventListener("click", (e) => {

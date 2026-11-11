@@ -709,3 +709,23 @@ details.p-section summary h4 { display: inline; }
 .install-steps > div { text-align: left; }
 .install-steps p { margin: 0 0 14px; }
 .ios-share { display: inline-block; border: 1px solid var(--line); border-radius: 6px; padding: 0 6px; }
+
+/* ---------- Mémoire temporaire / profonde ---------- */
+.deep { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.1; gap: 2px; }
+.deep small { font-size: 9.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); white-space: nowrap; }
+.prod { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.prod-calc { font-size: 11px; color: var(--muted); display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+.stars.sm { font-size: 10px; letter-spacing: 0; }
+.mem-i {
+  width: 18px; height: 18px; border-radius: 50%; padding: 0; margin-left: 3px; border: 1px solid var(--line); background: var(--card2);
+  color: var(--blue); font: italic 800 11px Georgia, serif; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;
+}
+.mem-i:hover { border-color: var(--blue); }
+.mem-info h4 { margin: 18px 0 6px; font-size: 15px; }
+.mem-info p { margin: 0 0 8px; line-height: 1.5; color: #cfd6ee; }
+.mem-this { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; line-height: 1.5; }
+.mem-table { border-collapse: collapse; margin: 4px 0 10px; font-size: 13.5px; }
+.mem-table th { text-align: left; font-weight: 600; color: var(--muted); font-size: 12px; padding: 3px 18px 3px 0; }
+.mem-table td { padding: 3px 18px 3px 0; border-top: 1px solid var(--line); }
+.mem-table tr.on td { color: var(--gold); font-weight: 700; }
+@media (pointer: coarse) { .mem-i { width: 24px; height: 24px; font-size: 13px; } }

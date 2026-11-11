@@ -26,7 +26,7 @@ const STR = {
     tier: (n) => `Niveau ${n}`,
 
     // Arbre
-    solidPct: (p) => `${p}% solide`,
+    solidPct: (p) => `${p}% en tête`,
     toLearn: "à apprendre",
     erodedTip: (n) => `${n} attribut(s) érodé(s)`,
     pipNone: (a) => `${a} : non greffé`,
@@ -51,7 +51,7 @@ const STR = {
     missing: (n) => `Il te manque 💡 ${n} — révise tes briques pour en gagner.`,
     preview: "Aperçu",
     discover10: "📖 Découvrir les 10 mots",
-    solidity: "<b>Solidité</b> de la brique",
+    solidity: "<b>Mémoire temporaire</b> de la brique",
     production: (x) => `Production : 💡 +${x} /min`,
     reviewBrick: "🔨 Réviser toute la brique",
     attrs: "Attributs",
@@ -59,8 +59,28 @@ const STR = {
     graftFor: (c) => `Greffer · 💡 ${c}`,
     toLearnBadge: "À APPRENDRE",
     firstLesson: "Première leçon",
-    starsTip: "Les étoiles montent quand tu révises au bon moment",
-    strengthPct: (p) => `Solidité ${p}%`,
+    starsTip: "Mémoire profonde : les étoiles montent quand tu t'entraînes au bon moment",
+    strengthPct: (p) => `Mémoire temporaire ${p}%`,
+    deepMem: "Mémoire profonde",
+    memCalc: (p, s) => `Mt ${p}% × Mp ${s}`,
+    memInfoTip: "Comment ça marche ?",
+    memTitle: "🧠 Les deux mémoires",
+    memBody: (stars, mult) => `
+      <h4>⏳ Mémoire temporaire (Mt) : la barre</h4>
+      <p>Ce que tu as en tête <b>maintenant</b>. Elle remonte à 100 % après chaque entraînement, puis se vide toute seule avec le temps.</p>
+      <h4>⭐ Mémoire profonde (Mp) : les étoiles</h4>
+      <p>Combien de temps la connaissance tient avant que la moitié s'efface :</p>${stars}
+      <p>Elle ne baisse pas avec le temps, seulement si tu rates un entraînement (moins de 70 %).</p>
+      <h4>💡 Production = Mt × Mp</h4>
+      <p>Chaque étoile ajoute <b>+50 %</b> de production. La mémoire temporaire décide de la part encaissée : à 0 %, l'attribut ne rapporte plus rien. Les briques avancées et les attributs difficiles rapportent aussi davantage.</p>
+      <h4>📈 Gagner des étoiles</h4>
+      <p>Réussis un entraînement (70 % ou plus). <b>Plus ta mémoire temporaire est basse</b> à ce moment-là, plus ta mémoire profonde grandit :</p>${mult}
+      <p>Mais tant que la barre est vide, l'attribut ne produit rien. À toi de trouver le bon moment !</p>`,
+    memMultHead: ["Mt au moment de t'entraîner", "Mp multipliée par"],
+    memStarsHead: ["Étoiles", "Tient environ"],
+    memThis: (ico, nm, mt, st, d) => `${ico} <b>${nm}</b> : Mt ${mt} % · Mp ${st} · tient ~${d}`,
+    memNext: (d) => `Prochaine étoile quand elle tiendra ${d}.`,
+    memMax: "Mémoire profonde au maximum !",
     erodesIn: (d) => `⏳ érodée dans ${d}`,
     eroded: "⚠️ érodée — à réparer !",
     train: "Entraîner",
@@ -221,7 +241,7 @@ const STR = {
     bandVocab: "Vocabulary", bandVocabSub: "— each brick = 10 words on one theme",
     tier: (n) => `Level ${n}`,
 
-    solidPct: (p) => `${p}% solid`,
+    solidPct: (p) => `${p}% fresh`,
     toLearn: "to learn",
     erodedTip: (n) => `${n} eroded upgrade(s)`,
     pipNone: (a) => `${a}: not added`,
@@ -244,7 +264,7 @@ const STR = {
     missing: (n) => `You need 💡 ${n} more — review your bricks to earn some.`,
     preview: "Preview",
     discover10: "📖 Discover the 10 words",
-    solidity: "Brick <b>strength</b>",
+    solidity: "Brick <b>short-term memory</b>",
     production: (x) => `Output: 💡 +${x} /min`,
     reviewBrick: "🔨 Review the whole brick",
     attrs: "Upgrades",
@@ -252,8 +272,28 @@ const STR = {
     graftFor: (c) => `Add · 💡 ${c}`,
     toLearnBadge: "TO LEARN",
     firstLesson: "First lesson",
-    starsTip: "Stars go up when you review at the right time",
-    strengthPct: (p) => `Strength ${p}%`,
+    starsTip: "Deep memory: stars go up when you practice at the right time",
+    strengthPct: (p) => `Short-term memory ${p}%`,
+    deepMem: "Deep memory",
+    memCalc: (p, s) => `ST ${p}% × DM ${s}`,
+    memInfoTip: "How does it work?",
+    memTitle: "🧠 Two kinds of memory",
+    memBody: (stars, mult) => `
+      <h4>⏳ Short-term memory (ST): the bar</h4>
+      <p>What you have in mind <b>right now</b>. It goes back to 100% after each practice, then empties on its own over time.</p>
+      <h4>⭐ Deep memory (DM): the stars</h4>
+      <p>How long the knowledge lasts before half of it fades:</p>${stars}
+      <p>It doesn't drop over time, only when you fail a practice (under 70%).</p>
+      <h4>💡 Production = ST × DM</h4>
+      <p>Each star adds <b>+50%</b> production. Short-term memory decides how much of it you collect: at 0%, the upgrade earns nothing. Advanced bricks and harder upgrades also earn more.</p>
+      <h4>📈 Earning stars</h4>
+      <p>Pass a practice (70% or more). <b>The lower your short-term memory</b> at that moment, the more your deep memory grows:</p>${mult}
+      <p>But while the bar is empty, the upgrade produces nothing. Find the right moment!</p>`,
+    memMultHead: ["ST when you practice", "DM multiplied by"],
+    memStarsHead: ["Stars", "Lasts about"],
+    memThis: (ico, nm, mt, st, d) => `${ico} <b>${nm}</b>: ST ${mt}% · DM ${st} · lasts ~${d}`,
+    memNext: (d) => `Next star when it lasts ${d}.`,
+    memMax: "Deep memory maxed out!",
     erodesIn: (d) => `⏳ erodes in ${d}`,
     eroded: "⚠️ eroded — repair it!",
     train: "Practice",
