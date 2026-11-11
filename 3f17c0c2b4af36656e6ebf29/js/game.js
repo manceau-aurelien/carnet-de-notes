@@ -1062,7 +1062,7 @@ function renderQ() {
   else body += `<div class="m-prompt ${q.sentence ? "sentence" : ""}">${q.prompt}${spk}</div>`;
   if (q.sub) body += `<div class="p-sub sub-line">${q.subPlain ? q.sub : `(${q.sub})`}</div>`;
 
-  const hint = IS_TOUCH ? (q.kind === "mcq" ? L("hintTap") : "") : q.kind === "mcq" ? L("hintMcq") : L("hintEnter");
+  const hint = q.kind === "speak" ? "" : IS_TOUCH ? (q.kind === "mcq" ? L("hintTap") : "") : q.kind === "mcq" ? L("hintMcq") : L("hintEnter");
   let foot = `<div class="fb"><span class="p-sub key-hint">${hint}</span></div>`;
   if (q.kind === "mcq") {
     body += `<div class="choices ${q.col ? "col" : ""}">${q.options.map((o, k) => `<button class="choice" data-c="${k}"><span class="k">${k + 1}</span><span>${o}</span></button>`).join("")}</div>`;
@@ -1117,7 +1117,11 @@ function renderQ() {
 // Exercice 🎤 : jusqu'à 3 essais ; une prononciation parfaite valide tout de suite
 function bindMic(q) {
   const btn = $("#modal [data-mic]"), st = $("#mic-st"), heard = $("#heard"), keep = $("#modal [data-keep]");
-  $("#modal [data-nomic]").onclick = () => { stopListen(); SES.noMic = true; SES.answered = true; nextQ(); };
+  $("#modal [data-nomic]").onclick = () => {
+    stopListen();
+    if (SES.boss) SES.firstTotal = Math.max(1, SES.firstTotal - SES.qs.slice(SES.i).filter((x) => x.kind === "speak").length);
+    SES.noMic = true; SES.answered = true; nextQ();
+  };
   if (!CAN_LISTEN) { btn.disabled = true; st.textContent = L("noMicSupport"); return; }
   const showHeard = (g) => {
     const words = speechTokens(g.exp);

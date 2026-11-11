@@ -3,13 +3,14 @@
 //  BRICKS — le boss de fin de niveau
 //  Conditions : attributs validés (au moins une fois) + 10 000 💡.
 //  Épreuve : 20 questions sur TOUT le programme (même non débloqué) :
-//  30 % traductions au clavier, 20 % dictées, 50 % exercices déjà vus.
+//  30 % traductions au clavier, 20 % dictées, 15 % phrases à dire au micro
+//  (si le navigateur sait écouter), le reste : exercices déjà vus.
 //  Vie : 100 %. Dégâts selon le score, régénération sous 40 %.
 // =====================================================================
 const BOSS = {
   cost: 10000,
   req: [["q", 3], ["neg", 6], ["aff", 9], ["spell", 12]],   // nombre de briques ayant validé l'attribut
-  n: 20, write: 6, dictation: 4,
+  n: 20, write: 6, dictation: 4, oral: 3,
   x: 50, y: 98, icon: "🐉",
 };
 // Barème : [score minimum (%), variation de vie]
@@ -33,7 +34,7 @@ Object.assign(STR.fr, {
   bossRulesTitle: "Comment fonctionne le boss ?",
   bossRules: [
     "<b>🔓 Le débloquer</b><br>Valide au moins une fois : ❓ Interrogatif sur <b>3</b> briques, 🚫 Négatif sur <b>6</b>, ✅ Affirmatif sur <b>9</b> et ✍️ Orthographe sur <b>12</b>. Puis paie <b>10 000 💡</b>.",
-    "<b>⚔️ L'épreuve (20 questions)</b><br>Elle porte sur <b>tout le programme</b>, même ce que tu n'as pas encore débloqué :<br>• 30 % : traduire une phrase <b>au clavier</b> (sans tuiles)<br>• 20 % : <b>dictée</b> — écrire ce que tu entends<br>• 50 % : exercices déjà vus<br>Pas de seconde chance pendant l'épreuve.",
+    "<b>⚔️ L'épreuve (20 questions)</b><br>Elle porte sur <b>tout le programme</b>, même ce que tu n'as pas encore débloqué :<br>• 30 % : traduire une phrase <b>au clavier</b> (sans tuiles)<br>• 20 % : <b>dictée</b> — écrire ce que tu entends<br>• 15 % : 🎤 <b>dire une phrase</b> à voix haute (3 essais)<br>• 35 % : exercices déjà vus<br>Pas de seconde chance pendant l'épreuve. Pas de micro ? « 🙊 Pas maintenant » retire les questions orales du score.",
     "<b>❤️ La vie du boss</b> (100 % au départ)<table class=\"boss-table\"><tr><td>100 % de bonnes réponses</td><td class=\"up\">−50 %</td></tr><tr><td>≥ 90 %</td><td class=\"up\">−25 %</td></tr><tr><td>≥ 80 %</td><td class=\"up\">−15 %</td></tr><tr><td>≥ 60 %</td><td class=\"up\">−10 %</td></tr><tr><td>&gt; 50 %</td><td class=\"up\">−5 %</td></tr><tr><td>40 à 50 %</td><td>aucun dégât</td></tr><tr><td>&lt; 40 %</td><td class=\"down\">il regagne 10 %</td></tr></table>",
     "<b>🏆 La victoire</b><br>Quand sa vie tombe à 0, le boss est vaincu : la suite de l'arbre s'ouvrira (nouvelles briques, puis les temps). Abandonner en cours d'épreuve compte comme une bataille, questions restantes fausses.",
   ],
@@ -69,7 +70,7 @@ Object.assign(STR.en, {
   bossRulesTitle: "How does the boss work?",
   bossRules: [
     "<b>🔓 Unlocking it</b><br>Complete at least once: ❓ Questions on <b>3</b> bricks, 🚫 Negative on <b>6</b>, ✅ Affirmative on <b>9</b> and ✍️ Spelling on <b>12</b>. Then pay <b>10,000 💡</b>.",
-    "<b>⚔️ The trial (20 questions)</b><br>It covers <b>the whole program</b>, even what you haven't unlocked yet:<br>• 30%: translate a sentence <b>by typing it</b> (no tiles)<br>• 20%: <b>dictation</b> — write what you hear<br>• 50%: exercises you've already seen<br>No second chances during the trial.",
+    "<b>⚔️ The trial (20 questions)</b><br>It covers <b>the whole program</b>, even what you haven't unlocked yet:<br>• 30%: translate a sentence <b>by typing it</b> (no tiles)<br>• 20%: <b>dictation</b> — write what you hear<br>• 15%: 🎤 <b>say a sentence</b> out loud (3 tries)<br>• 35%: exercises you've already seen<br>No second chances during the trial. No microphone? “🙊 Not now” removes the speaking questions from your score.",
     "<b>❤️ Boss health</b> (100% at the start)<table class=\"boss-table\"><tr><td>100% correct</td><td class=\"up\">−50%</td></tr><tr><td>≥ 90%</td><td class=\"up\">−25%</td></tr><tr><td>≥ 80%</td><td class=\"up\">−15%</td></tr><tr><td>≥ 60%</td><td class=\"up\">−10%</td></tr><tr><td>&gt; 50%</td><td class=\"up\">−5%</td></tr><tr><td>40 to 50%</td><td>no damage</td></tr><tr><td>&lt; 40%</td><td class=\"down\">it heals 10%</td></tr></table>",
     "<b>🏆 Victory</b><br>When its health drops to 0, the boss is defeated: the rest of the tree will open up (new bricks, then tenses). Quitting mid-trial counts as a battle, with the remaining questions marked wrong.",
   ],
@@ -261,8 +262,14 @@ function buildBossQuestions() {
     qs.push({ kind: "write", listen: true, slow: true, tag: L("tagDictation"), instr: L("qDictation"), say: s.tg[f], autoSay: true,
       accept: acceptVariants(s.tg[f]), solution: `${s.tg[f]} <span class="p-sub">(${s.nat[f]})</span>`, bid: b.id, aid: forms[f] });
   }
-  // 50 % : exercices déjà vus, piochés dans toutes les briques
-  const classic = ["vocab", "vocab", "vocab", "spell", "spell", "s", "s", "s", "s", "s"];
+  // 15 % : phrases du quotidien à dire au micro (toutes briques confondues)
+  const nOral = CAN_LISTEN ? BOSS.oral : 0;
+  shuffle(BRICKS.flatMap((b) => b.o.map((o) => ({ b, o })))).slice(0, nOral).forEach(({ b, o }) => {
+    qs.push({ kind: "speak", sentence: true, tag: L("tagOral"), instr: L("qSpeakSentence"), prompt: o.tg, say: o.tg,
+      sub: o.nat, subPlain: true, accept: [o.tg], solution: o.tg, bid: b.id, aid: "oral" });
+  });
+  // Le reste : exercices déjà vus, piochés dans toutes les briques
+  const classic = nOral ? ["vocab", "vocab", "spell", "s", "s", "s", "s"] : ["vocab", "vocab", "vocab", "spell", "spell", "s", "s", "s", "s", "s"];
   classic.forEach((t) => {
     const b = pick(BRICKS);
     let q;

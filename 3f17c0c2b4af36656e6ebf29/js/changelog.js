@@ -5,6 +5,19 @@
 // =====================================================================
 const CHANGELOG = [
   {
+    date: "2026-11-12", icon: "🐉",
+    fr: { title: "Le Dragon des Mots t'écoute", items: [
+      "L'épreuve du boss contient maintenant <b>3 phrases à dire au micro</b> 🎤, piochées dans tout le programme.",
+      "Elles remplacent 3 exercices déjà vus : il y a toujours 20 questions.",
+      "Pas de micro ou pas possible de parler ? « 🙊 Pas maintenant » retire ces questions du score, sans pénalité.",
+    ] },
+    en: { title: "The Word Dragon is listening", items: [
+      "The boss trial now includes <b>3 sentences to say out loud</b> 🎤, picked from the whole program.",
+      "They replace 3 exercises you've already seen: still 20 questions.",
+      "No microphone, or can't speak right now? “🙊 Not now” removes those questions from your score, with no penalty.",
+    ] },
+  },
+  {
     date: "2026-11-11", icon: "🎤",
     fr: { title: "Parle, BRICKS t'écoute", items: [
       "Nouvel attribut <b>🎤 Oral</b>, après ❓ : lis les mots et les phrases à voix haute.",
