@@ -278,18 +278,26 @@ function pickVoice() {
   for (const re of prefs) { VOICE = vs.find((v) => re.test(v.lang)); if (VOICE) return; }
 }
 if (HAS_TTS) speechSynthesis.onvoiceschanged = pickVoice;
+// La voix du jeu : on suit nous-mêmes quand elle parle (sur Android, speechSynthesis.speaking n'est pas fiable)
+let TTS_BUSY_UNTIL = 0, TTS_TALKING = false;
+const ttsBusy = () => TTS_TALKING && Date.now() < TTS_BUSY_UNTIL;
 function speak(text, delay = 0, rate = 0.88) {
   if (!sound() || !HAS_TTS || !COURSE) return;
   setTimeout(() => {
-    if (typeof REC !== "undefined" && REC) return;          // le micro écoute : on ne parle pas par-dessus
+    if (typeof REC !== "undefined" && (REC || MIC_BUSY)) return;   // le micro écoute : on ne parle pas par-dessus
     speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
     u.lang = VOICE ? VOICE.lang : COURSE.target === "fr" ? "fr-FR" : "en-GB";
     if (VOICE) u.voice = VOICE;
     u.rate = rate;
+    // Sécurité : au pire la voix est considérée finie après une durée estimée d'après la longueur du texte
+    TTS_TALKING = true; TTS_BUSY_UNTIL = Date.now() + 2000 + (text.length * 110) / rate;
+    u.onend = u.onerror = () => { if (TTS_LAST === u) { TTS_TALKING = false; TTS_ENDED_AT = Date.now(); } };
+    TTS_LAST = u;
     speechSynthesis.speak(u);
   }, delay);
 }
+let TTS_LAST = null, TTS_ENDED_AT = 0;
 let AC = null;
 function beep(notes, type = "sine", dur = 0.09, vol = 0.08) {
   if (!sound()) return;
@@ -928,13 +936,15 @@ function gradeTyped(input, accept) {
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 const CAN_LISTEN = !!SR;
 const MIC_TRIES = 3;
-let REC = null;
-function stopListen() { if (REC) { const r = REC; REC = null; r.onresult = r.onerror = r.onend = r.onstart = r.onaudiostart = null; try { r.abort(); } catch (e) { /* déjà fini */ } } }
+const MIC_GAP = 500;          // pause entre la fin de la voix et l'ouverture du micro
+const MIC_READY_MIN = 500;    // « Parle maintenant » jamais avant 0,5 s
+let REC = null, MIC_BUSY = false;
+function stopListen() { MIC_BUSY = false; if (REC) { const r = REC; REC = null; r.onresult = r.onerror = r.onend = r.onstart = r.onaudiostart = null; try { r.abort(); } catch (e) { /* déjà fini */ } } }
 // Écoute une phrase ; onDone(liste des transcriptions possibles | null, code d'erreur | null)
 // onReady() est appelé quand le micro enregistre vraiment (le téléphone peut mettre 1 à 3 s à l'ouvrir)
 function listenOnce(onPartial, onDone, onReady = () => {}) {
   stopListen();
-  if (HAS_TTS) speechSynthesis.cancel();
+  if (HAS_TTS && ttsBusy()) { speechSynthesis.cancel(); TTS_TALKING = false; }
   const r = new SR(); REC = r;
   r.lang = COURSE.target === "fr" ? "fr-FR" : "en-GB";
   r.interimResults = true; r.maxAlternatives = 5; r.continuous = false;
@@ -1103,23 +1113,28 @@ function bindMic(q) {
     if (SES.mic.waiting) return;
     heard.innerHTML = "";
     // La voix du jeu est encore en train de parler : on attend qu'elle finisse au lieu de la couper
-    if (HAS_TTS && (speechSynthesis.speaking || speechSynthesis.pending)) {
+    if (HAS_TTS && ttsBusy()) {
       SES.mic.waiting = true; btn.classList.add("wait"); st.textContent = L("micWaitVoice");
       const t1 = Date.now();
       const poll = () => {
         if (!SES || SES.qs[SES.i] !== q || SES.answered) return;
-        if ((speechSynthesis.speaking || speechSynthesis.pending) && Date.now() - t1 < 8000) return setTimeout(poll, 150);
-        SES.mic.waiting = false; setTimeout(start, 250);
+        if (ttsBusy() && Date.now() - t1 < 8000) return setTimeout(poll, 150);
+        setTimeout(() => { if (SES && SES.mic) SES.mic.waiting = false; start(); }, MIC_GAP);
       };
       return setTimeout(poll, 150);
     }
+    const gap = MIC_GAP - (Date.now() - TTS_ENDED_AT);   // la voix vient juste de finir : petite pause
+    if (gap > 0) { SES.mic.waiting = true; btn.classList.add("wait"); st.textContent = L("micWait");
+      return setTimeout(() => { if (SES && SES.mic) SES.mic.waiting = false; start(); }, gap); }
     start();
   };
+  let readyT = null;
   const start = () => {
     if (!SES || SES.qs[SES.i] !== q || SES.answered) return;
     btn.classList.add("wait"); st.textContent = L("micWait");
-    const t0 = Date.now();
+    const t0 = Date.now(); MIC_BUSY = true;
     listenOnce((p) => { heard.innerHTML = `<div class="heard-txt live">${esc(p)}</div>`; }, (alts, err) => {
+      MIC_BUSY = false; clearTimeout(readyT);
       btn.classList.remove("on", "wait");
       if (!SES || SES.answered || SES.qs[SES.i] !== q) return;
       if (!alts) {
@@ -1136,9 +1151,13 @@ function bindMic(q) {
       st.innerHTML = L("micAgain", left);
       keep.classList.remove("hidden");
     }, () => {
-      btn.classList.remove("wait"); btn.classList.add("on");
-      st.innerHTML = L("micListening") + (window.BRICKS_TEST ? ` <span class="p-sub">(${((Date.now() - t0) / 1000).toFixed(1)} s)</span>` : "");
-      beep([988], "sine", 0.07, 0.05);
+      // Micro ouvert : on attend encore un peu (au moins 0,5 s après le toucher) avant de dire « Parle »
+      readyT = setTimeout(() => {
+        if (!REC) return;
+        btn.classList.remove("wait"); btn.classList.add("on");
+        st.innerHTML = L("micListening") + (window.BRICKS_TEST ? ` <span class="p-sub">(${((Date.now() - t0) / 1000).toFixed(1)} s)</span>` : "");
+        beep([988], "sine", 0.07, 0.05);
+      }, Math.max(MIC_READY_MIN - (Date.now() - t0), 200));
     });
   };
   keep.onclick = () => answer(SES.mic.best ? SES.mic.best.credit : 0);
