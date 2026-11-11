@@ -5,6 +5,23 @@
 // =====================================================================
 const CHANGELOG = [
   {
+    date: "2026-11-12", icon: "🎤",
+    fr: { title: "L'oral arrive plus tôt", items: [
+      "L'attribut <b>🎤 Oral</b> se greffe maintenant juste après ✍️ Orthographe : on parle dès le début !",
+      "Nouvel ordre : 📖 → ✍️ → 🎤 → ✅ → 🚫 → ❓. Pour greffer ✅, il faut d'abord avoir validé 🎤 (sauf si ton navigateur ne sait pas écouter).",
+      "Nouveaux prix de base : 🎤 25, ✅ 35, 🚫 55 (✍️ 15 et ❓ 80 ne changent pas).",
+      "À l'oral, les phrases de la brique n'arrivent qu'aux formes déjà apprises (✅ 🚫 ❓) ; avant, ce sont des phrases du quotidien et des mots.",
+      "Ce que tu as déjà greffé ou validé est conservé.",
+    ] },
+    en: { title: "Speaking comes earlier", items: [
+      "The <b>🎤 Speaking</b> upgrade now comes right after ✍️ Spelling: you start talking from the beginning!",
+      "New order: 📖 → ✍️ → 🎤 → ✅ → 🚫 → ❓. To add ✅, you first need to pass 🎤 (unless your browser can't listen).",
+      "New base prices: 🎤 25, ✅ 35, 🚫 55 (✍️ 15 and ❓ 80 stay the same).",
+      "When speaking, the brick's sentences only come in the forms you've already learned (✅ 🚫 ❓); before that, it's everyday phrases and words.",
+      "Everything you've already added or passed is kept.",
+    ] },
+  },
+  {
     date: "2026-11-12", icon: "🐉",
     fr: { title: "Le Dragon des Mots t'écoute", items: [
       "L'épreuve du boss contient maintenant <b>3 phrases à dire au micro</b> 🎤, piochées dans tout le programme.",

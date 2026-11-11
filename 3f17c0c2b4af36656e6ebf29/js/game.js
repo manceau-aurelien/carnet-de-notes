@@ -13,7 +13,7 @@ const BASE_HL = 15 * MIN;          // demi-vie après la 1re leçon (≈15-21 mi
 const MIN_HL = 5 * MIN;
 const MAX_HL = 120 * DAY;
 const STAR_HL = [10 * MIN, HOUR, 6 * HOUR, DAY, 5 * DAY]; // seuils des étoiles
-const ATTR_WEIGHT = { vocab: 1, spell: 1.2, aff: 1.5, neg: 2, q: 2.5, oral: 2.5 };
+const ATTR_WEIGHT = { vocab: 1, spell: 1.2, oral: 1.35, aff: 1.5, neg: 2, q: 2.5 };
 const BRICK_COST = [0, 25, 70, 150];
 const FORM = { aff: 0, neg: 1, q: 2 };
 const OFFLINE_CAP = 12 * HOUR;
@@ -40,10 +40,10 @@ const LAYOUT = {
 const ATTRS = [
   { id: "vocab", icon: "📖", cost: 0, skill: null },
   { id: "spell", icon: "✍️", cost: 15, skill: "spell" },
-  { id: "aff", icon: "✅", cost: 30, skill: "aff" },
-  { id: "neg", icon: "🚫", cost: 50, skill: "neg" },
+  { id: "oral", icon: "🎤", cost: 25, skill: null },
+  { id: "aff", icon: "✅", cost: 35, skill: "aff" },
+  { id: "neg", icon: "🚫", cost: 55, skill: "neg" },
   { id: "q", icon: "❓", cost: 80, skill: "q" },
-  { id: "oral", icon: "🎤", cost: 100, skill: null },
 ];
 const AT = Object.fromEntries(ATTRS.map((a) => [a.id, a]));
 const SKILL_DEF = [
@@ -233,7 +233,8 @@ function attrLockReason(b, at) {
   if (at.skill && !S.skills[at.skill]) return L("needSkill", SK[at.skill].icon, SK[at.skill].name);
   if (at.id === "oral" && !CAN_LISTEN) return L("noMicSupport");
   // Chaîne : l'attribut précédent doit avoir été terminé au moins une fois (l'érosion ne retire pas l'accès)
-  const k = ATTRS.indexOf(at);
+  let k = ATTRS.indexOf(at);
+  if (k > 0 && ATTRS[k - 1].id === "oral" && !CAN_LISTEN) k--;   // sans micro, l'oral ne bloque pas la suite
   if (k > 0) {
     const prev = ATTRS[k - 1], pa = bs.attrs[prev.id];
     if (!pa || !pa.learned) return L("needPrev", prev.icon, attrName(prev.id));
@@ -894,16 +895,20 @@ function genSentence(b, aid, used, st) {
 }
 
 // 🎤 Oral : un mélange de phrases du quotidien (½), de phrases de la brique (¼) et de mots (¼).
+// (Arrive juste après ✍️ : tant que ✅ 🚫 ❓ ne sont pas appris, seulement des phrases du quotidien et des mots.)
 // Jamais deux fois la même chose dans une séance, et on évite ce qui est sorti aux dernières séances.
 const ORAL_RECENT = 20;
 function genOral(b, used) {
   const bs = S.bricks[b.id], recent = new Set(bs.oralRecent || []);
   const pools = {
     o: b.o.map((x, k) => ({ key: "o" + k, tg: x.tg, nat: x.nat, sentence: true })),
-    s: b.s.flatMap((x, k) => x.tg.map((t, f) => ({ key: `s${k}.${f}`, base: "s" + k, tg: t, nat: x.nat[f], sentence: true }))),
+    // phrases de la brique : seulement aux formes (✅ 🚫 ❓) déjà apprises sur cette brique
+    s: b.s.flatMap((x, k) => x.tg.map((t, f) => ({ key: `s${k}.${f}`, base: "s" + k, f, tg: t, nat: x.nat[f], sentence: true })))
+      .filter((x) => bs.attrs[["aff", "neg", "q"][x.f]] && bs.attrs[["aff", "neg", "q"][x.f]].learned),
     w: b.w.map((x, k) => ({ key: "w" + k, tg: x.tg, nat: x.nat, alts: x.alts, wi: k })),
   };
-  const r = Math.random(), want = !pools.o.length ? (r < 0.4 ? "w" : "s") : r < 0.5 ? "o" : r < 0.75 ? "s" : "w";
+  const r = Math.random();
+  const want = !pools.o.length ? (r < 0.4 || !pools.s.length ? "w" : "s") : r < 0.5 ? "o" : r < 0.75 && pools.s.length ? "s" : r < 0.75 ? "o" : "w";
   const order = [want, ...["o", "s", "w"].filter((k) => k !== want)];
   let item = null;
   for (const avoidRecent of [true, false]) {
