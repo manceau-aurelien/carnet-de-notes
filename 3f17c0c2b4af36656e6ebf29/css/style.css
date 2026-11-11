@@ -761,3 +761,5 @@ details.p-section summary h4 { display: inline; }
 .heard-exp { margin-top: 6px; font-size: 15px; }
 .heard-exp .hit { color: var(--good); }
 .heard-exp .miss { color: var(--bad); text-decoration: underline wavy; font-weight: 700; }
+.mic-btn.wait { border-color: var(--gold); opacity: .8; animation: micWait 1s ease-in-out infinite; }
+@keyframes micWait { 50% { transform: scale(.94); } }

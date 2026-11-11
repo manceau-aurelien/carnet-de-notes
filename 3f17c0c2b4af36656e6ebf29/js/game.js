@@ -928,16 +928,21 @@ const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 const CAN_LISTEN = !!SR;
 const MIC_TRIES = 3;
 let REC = null;
-function stopListen() { if (REC) { const r = REC; REC = null; r.onresult = r.onerror = r.onend = null; try { r.abort(); } catch (e) { /* déjà fini */ } } }
+function stopListen() { if (REC) { const r = REC; REC = null; r.onresult = r.onerror = r.onend = r.onstart = r.onaudiostart = null; try { r.abort(); } catch (e) { /* déjà fini */ } } }
 // Écoute une phrase ; onDone(liste des transcriptions possibles | null, code d'erreur | null)
-function listenOnce(onPartial, onDone) {
+// onReady() est appelé quand le micro enregistre vraiment (le téléphone peut mettre 1 à 3 s à l'ouvrir)
+function listenOnce(onPartial, onDone, onReady = () => {}) {
   stopListen();
   if (HAS_TTS) speechSynthesis.cancel();
   const r = new SR(); REC = r;
   r.lang = COURSE.target === "fr" ? "fr-FR" : "en-GB";
   r.interimResults = true; r.maxAlternatives = 5; r.continuous = false;
-  let alts = null, partial = "", err = null;
+  let alts = null, partial = "", err = null, ready = false, fallback = null;
+  const isReady = () => { if (ready || REC !== r) return; ready = true; clearTimeout(fallback); onReady(); };
+  r.onaudiostart = isReady;
+  r.onstart = () => { fallback = setTimeout(isReady, 4000); };   // secours si « audiostart » n'arrive jamais
   r.onresult = (e) => {
+    isReady();
     const res = [...e.results];
     partial = res.map((x) => x[0].transcript).join(" ");
     if (res.every((x) => x.isFinal)) {
@@ -946,7 +951,7 @@ function listenOnce(onPartial, onDone) {
     onPartial(partial);
   };
   r.onerror = (e) => { err = e.error; };
-  r.onend = () => { if (REC !== r) return; REC = null; onDone(alts || (partial ? [partial] : null), alts || partial ? null : err || "no-speech"); };
+  r.onend = () => { clearTimeout(fallback); if (REC !== r) return; REC = null; onDone(alts || (partial ? [partial] : null), alts || partial ? null : err || "no-speech"); };
   try { r.start(); } catch (e) { REC = null; onDone(null, "start"); }
 }
 
@@ -1094,9 +1099,10 @@ function bindMic(q) {
   btn.onclick = () => {
     if (SES.answered) return;
     if (REC) { try { REC.stop(); } catch (e) { /* rien */ } return; }
-    btn.classList.add("on"); st.textContent = L("micListening"); heard.innerHTML = "";
+    btn.classList.add("wait"); st.textContent = L("micWait"); heard.innerHTML = "";
+    const t0 = Date.now();
     listenOnce((p) => { heard.innerHTML = `<div class="heard-txt live">${esc(p)}</div>`; }, (alts, err) => {
-      btn.classList.remove("on");
+      btn.classList.remove("on", "wait");
       if (!SES || SES.answered || SES.qs[SES.i] !== q) return;
       if (!alts) {
         st.innerHTML = L(err === "not-allowed" || err === "service-not-allowed" ? "micDenied" : err === "network" ? "micNetwork" : "micNothing");
@@ -1111,6 +1117,10 @@ function bindMic(q) {
       if (left <= 0) return answer(SES.mic.best.credit);
       st.innerHTML = L("micAgain", left);
       keep.classList.remove("hidden");
+    }, () => {
+      btn.classList.remove("wait"); btn.classList.add("on");
+      st.innerHTML = L("micListening") + (window.BRICKS_TEST ? ` <span class="p-sub">(${((Date.now() - t0) / 1000).toFixed(1)} s)</span>` : "");
+      beep([988], "sine", 0.07, 0.05);
     });
   };
   keep.onclick = () => answer(SES.mic.best ? SES.mic.best.credit : 0);
