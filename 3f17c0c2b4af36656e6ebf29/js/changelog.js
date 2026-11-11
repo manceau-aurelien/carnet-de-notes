@@ -5,6 +5,21 @@
 // =====================================================================
 const CHANGELOG = [
   {
+    date: "2026-11-11", icon: "📲",
+    fr: { title: "BRICKS s'installe comme une application", items: [
+      "Un bouton « 📲 Installer l'application » apparaît sur l'écran de choix du profil.",
+      "Sur Android et sur ordinateur, il ouvre directement l'installation ; sur iPhone, il montre les 2 gestes à faire dans Safari.",
+      "Une fois installé, BRICKS s'ouvre depuis son icône, en plein écran, comme une vraie application.",
+      "Le jeu démarre même sans Internet (le compte en ligne et les amis, eux, ont besoin d'une connexion).",
+    ] },
+    en: { title: "BRICKS installs like an app", items: [
+      "An “📲 Install the app” button now appears on the profile screen.",
+      "On Android and computers it opens the install window directly; on iPhone it shows the 2 steps to do in Safari.",
+      "Once installed, BRICKS opens from its icon, full screen, like a real app.",
+      "The game even starts without Internet (your online account and friends still need a connection).",
+    ] },
+  },
+  {
     date: "2026-11-10", icon: "📜",
     fr: { title: "Historique des mises à jour", items: [
       "Cette fenêtre ! Elle liste les nouveautés, de la plus récente à la plus ancienne.",

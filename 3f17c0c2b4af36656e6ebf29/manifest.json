@@ -1,0 +1,37 @@
+{
+  "id": "bricks-test",
+  "name": "BRICKS TEST",
+  "short_name": "Bricks TEST",
+  "description": "Jeu incrémental pour apprendre une langue : débloque des briques de vocabulaire et révise-les avant qu'elles ne s'érodent.",
+  "lang": "fr-FR",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0f1424",
+  "theme_color": "#0f1424",
+  "categories": [
+    "games",
+    "education"
+  ],
+  "icons": [
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

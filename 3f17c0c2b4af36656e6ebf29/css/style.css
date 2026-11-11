@@ -703,3 +703,9 @@ details.p-section summary h4 { display: inline; }
 .test-menu .menu-head { color: var(--violet); }
 .test-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
 .test-actions .btn { justify-content: flex-start; text-align: left; }
+
+/* ---------- Installer l'application ---------- */
+.install-row { display: flex; justify-content: center; margin-top: 26px; }
+.install-steps > div { text-align: left; }
+.install-steps p { margin: 0 0 14px; }
+.ios-share { display: inline-block; border: 1px solid var(--line); border-radius: 6px; padding: 0 6px; }

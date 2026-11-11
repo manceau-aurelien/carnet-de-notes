@@ -1208,7 +1208,8 @@ function renderProfiles() {
     <h1>${X("whoPlays")}</h1><p class="scr-sub">${X("profilesSub")}</p>
     <div class="profiles">${cards}
       <button class="pcard add" data-new><div class="pava">＋</div><div class="pname">${X("newProfile")}</div></button>
-      ${HAS_CLOUD ? `<button class="pcard add" data-restore><div class="pava">☁️</div><div class="pname">${X("restoreCard")}</div></button>` : ""}</div></div>`;
+      ${HAS_CLOUD ? `<button class="pcard add" data-restore><div class="pava">☁️</div><div class="pname">${X("restoreCard")}</div></button>` : ""}</div>
+    ${typeof installButtonHtml === "function" ? installButtonHtml(PL) : ""}</div>`;
 }
 
 function profileForm(PL, p, onSubmit, extraFoot = "") {
