@@ -1232,7 +1232,7 @@ function answer(choice, skipped = false) {
     <button class="btn ${cls === "ko" ? "btn-bad" : "btn-good"} btn-big" data-next>${L("cont")}</button>`;
   $("#modal [data-next]").onclick = nextQ;
   if (!IS_TOUCH) $("#modal [data-next]").focus();
-  if (q.sayAfter || q.say) speak(q.sayAfter || q.say, 250);
+  if ((q.sayAfter || q.say) && q.kind !== "speak") speak(q.sayAfter || q.say, 250);   // à l'oral, relire la phrase ferait un écho
   renderTop();
 }
 
