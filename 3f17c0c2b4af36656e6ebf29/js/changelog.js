@@ -5,6 +5,21 @@
 // =====================================================================
 const CHANGELOG = [
   {
+    date: "2026-11-11", icon: "🔁",
+    fr: { title: "Le rattrapage peut sauver une leçon", items: [
+      "Les questions ratées, reposées à la fin de la leçon, comptent maintenant pour valider une première leçon.",
+      "Deux façons de valider : au moins <b>70 %</b> du premier coup, ou au moins <b>90 %</b> au total une fois le rattrapage fait.",
+      "Cette règle remplace les 80 % demandés aux essais suivants : elle est la même à chaque essai.",
+      "En cas d'échec, un petit <b>i</b> explique les conditions et montre ton score.",
+    ] },
+    en: { title: "The catch-up round can save a lesson", items: [
+      "Missed questions, asked again at the end of the lesson, now count towards passing a first lesson.",
+      "Two ways to pass: at least <b>70%</b> on the first try, or at least <b>90%</b> in total once the catch-up round is done.",
+      "This replaces the 80% required on later attempts: the rule is now the same every time.",
+      "If you fail, a small <b>i</b> explains the rules and shows your score.",
+    ] },
+  },
+  {
     date: "2026-11-11", icon: "🎯",
     fr: { title: "Une première leçon se mérite", items: [
       "Pour valider une brique ou un attribut la première fois, il faut au moins <b>70 %</b> de bonnes réponses.",

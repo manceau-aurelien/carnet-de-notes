@@ -735,3 +735,11 @@ details.p-section summary h4 { display: inline; }
 .need-hint b { color: var(--gold); }
 .need-hint.center { text-align: center; margin: 8px 0 4px; }
 .res-row.failed { border: 1px solid rgba(255, 93, 115, .45); }
+
+/* ---------- Rattrapage ---------- */
+.need-hint .mem-i, .r-hl .mem-i { vertical-align: middle; }
+.r-hl.caught { color: var(--good); }
+.pass-info { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 4px 14px 6px; margin: 10px 0 4px; }
+.pass-info h4 { margin: 10px 0 6px; font-size: 15px; }
+.pass-info p { margin: 0 0 8px; line-height: 1.5; color: #cfd6ee; font-size: 14px; }
+.pass-info .mem-this { margin: 4px 0 10px; }
