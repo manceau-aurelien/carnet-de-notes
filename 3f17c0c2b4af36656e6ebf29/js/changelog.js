@@ -5,6 +5,19 @@
 // =====================================================================
 const CHANGELOG = [
   {
+    date: "2026-11-13", icon: "🎯",
+    fr: { title: "L'oral reste dans la brique", items: [
+      "Les phrases à dire utilisent maintenant <b>les 10 mots de la brique</b>, et rien d'autre : l'oral sert à les répéter sous un autre angle.",
+      "Une phrase par mot, au <b>présent</b> seulement, comme dans les autres exercices (fini les phrases hors thème ou à des temps pas encore vus).",
+      "D'abord à la forme affirmative ; les phrases négatives et les questions arrivent quand tu as appris 🚫 et ❓ sur la brique.",
+    ] },
+    en: { title: "Speaking stays in the brick", items: [
+      "Sentences to say now use <b>the brick's 10 words</b>, and nothing else: speaking is another way to repeat them.",
+      "One sentence per word, in the <b>present tense</b> only, like the other exercises (no more off-topic sentences or tenses you haven't seen).",
+      "Affirmative first; negative sentences and questions come once you've learned 🚫 and ❓ on the brick.",
+    ] },
+  },
+  {
     date: "2026-11-12", icon: "🗣️",
     fr: { title: "Un oral plus fiable", items: [
       "L'oral ne propose plus que des <b>phrases</b> : les mots tout seuls étaient trop mal captés par les micros des téléphones.",

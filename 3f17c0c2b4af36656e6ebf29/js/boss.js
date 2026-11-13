@@ -265,8 +265,9 @@ function buildBossQuestions() {
   // 15 % : phrases du quotidien à dire au micro (toutes briques confondues)
   const nOral = CAN_LISTEN ? BOSS.oral : 0;
   shuffle(BRICKS.flatMap((b) => b.o.map((o) => ({ b, o })))).slice(0, nOral).forEach(({ b, o }) => {
-    qs.push({ kind: "speak", sentence: true, tag: L("tagOral"), instr: L("qSpeakSentence"), prompt: o.tg, say: o.tg,
-      sub: o.nat, subPlain: true, accept: [o.tg], solution: o.tg, bid: b.id, aid: "oral" });
+    const f = Math.floor(Math.random() * 3), tg = o.tg[f];
+    qs.push({ kind: "speak", sentence: true, tag: L("tagOral"), instr: L("qSpeakSentence"), prompt: tg, say: tg,
+      sub: o.nat[f], subPlain: true, accept: [tg], solution: tg, bid: b.id, aid: "oral" });
   });
   // Le reste : exercices déjà vus, piochés dans toutes les briques
   const classic = nOral ? ["vocab", "vocab", "spell", "s", "s", "s", "s"] : ["vocab", "vocab", "vocab", "spell", "spell", "s", "s", "s", "s", "s"];
