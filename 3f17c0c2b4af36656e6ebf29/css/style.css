@@ -771,3 +771,4 @@ details.p-section summary h4 { display: inline; }
   .m-foot .nomic-foot, .m-foot [data-keep] { white-space: normal; line-height: 1.2; padding: 12px 10px; font-size: 15px; }
   .m-foot [data-keep] { flex: 1 1 0; min-width: 0; }
 }
+.oral-note { margin-bottom: 12px; border-color: rgba(255, 196, 0, .45); }

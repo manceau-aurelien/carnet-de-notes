@@ -60,16 +60,17 @@ const STR = {
     toLearnBadge: "À APPRENDRE",
     firstLesson: "Première leçon",
     retryLesson: "🔁 Réessayer",
-    needPct: (t) => `🎯 ${t ? `Essai n° ${t + 1} · ` : ""}Pour valider : <b>70 %</b> du premier coup, ou <b>90 %</b> avec le rattrapage.`,
+    needPct: (t, p1 = 70, p2 = 90) => `🎯 ${t ? `Essai n° ${t + 1} · ` : ""}Pour valider : <b>${p1} %</b> du premier coup, ou <b>${p2} %</b> avec le rattrapage.`,
+    oralPassNote: (p1, p2) => `🎤 <b>L'oral n'est pas encore tout à fait au point</b> : le micro reconnaît encore mal certaines phrases, même bien prononcées. En attendant, nous baissons volontairement les exigences pour valider cet attribut : <b>${p1} %</b> du premier coup, ou <b>${p2} %</b> avec le rattrapage (au lieu de 70 % et 90 %).`,
     notValidated: "❌ Pas encore validé",
     savedByCatchup: "🔁 Validé grâce au rattrapage !",
     firstFailTip: "Pas encore validé, mais le Savoir gagné est conservé. Relis bien la leçon et retente ta chance ! Touche le <b>i</b> pour voir les conditions.",
     passInfoTip: "Conditions de validation",
     passTitle: "🎯 Valider une première leçon",
-    passRules: `<p>Il y a <b>deux façons</b> de valider :</p>
-      <p>1️⃣ <b>Du premier coup</b> : au moins <b>70 %</b> de bonnes réponses au premier passage.</p>
-      <p>2️⃣ <b>Grâce au rattrapage</b> : les questions ratées sont reposées à la fin. Chaque bonne réponse du rattrapage s'ajoute à ton score, et il faut alors atteindre <b>90 %</b> au total.</p>
-      <p class="p-sub">Exemple sur 10 questions : 6 justes au premier passage (60 %), puis 3 sur 4 au rattrapage → 9 sur 10 = 90 %, c'est validé !</p>`,
+    passRules: (p1 = 70, p2 = 90, ex = true) => `<p>Il y a <b>deux façons</b> de valider :</p>
+      <p>1️⃣ <b>Du premier coup</b> : au moins <b>${p1} %</b> de bonnes réponses au premier passage.</p>
+      <p>2️⃣ <b>Grâce au rattrapage</b> : les questions ratées sont reposées à la fin. Chaque bonne réponse du rattrapage s'ajoute à ton score, et il faut alors atteindre <b>${p2} %</b> au total.</p>
+      ${ex ? `<p class="p-sub">Exemple sur 10 questions : 6 justes au premier passage (60 %), puis 3 sur 4 au rattrapage → 9 sur 10 = 90 %, c'est validé !</p>` : ""}`,
     passMine: (s, t) => `Ton essai : <b>${s}&nbsp;%</b> au premier passage, <b>${t}&nbsp;%</b> avec le rattrapage.`,
     passAfter: "Pas validé ? Le Savoir gagné est conservé. Relis la leçon et retente ta chance : la règle est la même à chaque essai.",
     starsTip: "Mémoire profonde : les étoiles montent quand tu t'entraînes au bon moment",
@@ -310,16 +311,17 @@ const STR = {
     toLearnBadge: "TO LEARN",
     firstLesson: "First lesson",
     retryLesson: "🔁 Try again",
-    needPct: (t) => `🎯 ${t ? `Attempt #${t + 1} · ` : ""}To pass: <b>70%</b> on the first try, or <b>90%</b> with the catch-up round.`,
+    needPct: (t, p1 = 70, p2 = 90) => `🎯 ${t ? `Attempt #${t + 1} · ` : ""}To pass: <b>${p1}%</b> on the first try, or <b>${p2}%</b> with the catch-up round.`,
+    oralPassNote: (p1, p2) => `🎤 <b>Speaking isn't quite ready yet</b>: the microphone still misses some sentences, even when they're well pronounced. Meanwhile, we're deliberately lowering the bar to pass this upgrade: <b>${p1}%</b> on the first try, or <b>${p2}%</b> with the catch-up round (instead of 70% and 90%).`,
     notValidated: "❌ Not passed yet",
     savedByCatchup: "🔁 Passed thanks to the catch-up round!",
     firstFailTip: "Not passed yet, but you keep the Knowledge you earned. Review the lesson and try again! Tap the <b>i</b> to see the rules.",
     passInfoTip: "How to pass",
     passTitle: "🎯 Passing a first lesson",
-    passRules: `<p>There are <b>two ways</b> to pass:</p>
-      <p>1️⃣ <b>On the first try</b>: at least <b>70%</b> correct answers in the first round.</p>
-      <p>2️⃣ <b>With the catch-up round</b>: the questions you missed come back at the end. Each correct catch-up answer is added to your score, and you then need <b>90%</b> in total.</p>
-      <p class="p-sub">Example with 10 questions: 6 right in the first round (60%), then 3 out of 4 in the catch-up → 9 out of 10 = 90%, passed!</p>`,
+    passRules: (p1 = 70, p2 = 90, ex = true) => `<p>There are <b>two ways</b> to pass:</p>
+      <p>1️⃣ <b>On the first try</b>: at least <b>${p1}%</b> correct answers in the first round.</p>
+      <p>2️⃣ <b>With the catch-up round</b>: the questions you missed come back at the end. Each correct catch-up answer is added to your score, and you then need <b>${p2}%</b> in total.</p>
+      ${ex ? `<p class="p-sub">Example with 10 questions: 6 right in the first round (60%), then 3 out of 4 in the catch-up → 9 out of 10 = 90%, passed!</p>` : ""}`,
     passMine: (s, t) => `Your attempt: <b>${s}%</b> in the first round, <b>${t}%</b> with the catch-up.`,
     passAfter: "Didn't pass? You keep the Knowledge you earned. Review the lesson and try again: the rule is the same every time.",
     starsTip: "Deep memory: stars go up when you practice at the right time",

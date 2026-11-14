@@ -247,6 +247,10 @@ function attrLockReason(b, at) {
 // Première leçon d'un attribut (même règle à chaque essai)
 // Validée si : 70 % du premier coup, OU 90 % au total en comptant le rattrapage de fin de leçon
 const PASS_FIRST = 0.7, PASS_CATCHUP = 0.9;
+// Exception provisoire : 🎤 Oral (le micro reconnaît encore mal certaines phrases) → 50 % / 60 %
+const PASS_BY_ATTR = { oral: [0.5, 0.6] };
+const passOf = (aid) => PASS_BY_ATTR[aid] || [PASS_FIRST, PASS_CATCHUP];
+const pct100 = (x) => Math.round(x * 100);
 function newBrickState(b) { return { attrs: { vocab: { learned: false } }, werr: Array(b.w.length).fill(1), isNew: true }; }
 function spend(n) { if (S.savoir < n) return false; S.savoir -= n; return true; }
 
@@ -493,6 +497,13 @@ function skillPanel(s) {
 
 function gtag(w) { return w.g ? `<span class="gtag ${w.g}">${w.g === "m" ? L("masc") : L("fem")}</span>` : ""; }
 
+// Seuil à atteindre pour une première leçon (+ petit i après un échec, et toujours pour l'oral)
+function needHintHtml(aid, tries) {
+  const [p1, p2] = passOf(aid), info = tries || PASS_BY_ATTR[aid];
+  return L("needPct", tries, pct100(p1), pct100(p2))
+    + (info ? ` <button class="mem-i" data-act="pass-info" data-attr="${aid}" title="${esc(L("passInfoTip"))}" aria-label="${esc(L("passInfoTip"))}">i</button>` : "");
+}
+
 function brickPanel(b) {
   const bs = S.bricks[b.id];
   const head = `<div class="p-head"><div class="p-ico">${b.icon}</div><div>
@@ -510,7 +521,7 @@ function brickPanel(b) {
   const sol = brickSolidity(b);
   const top = !bs.attrs.vocab.learned
     ? `<button class="btn btn-gold btn-big full" data-act="learn-vocab">${bs.attrs.vocab.tries ? L("retryLesson") : L("discover10")}</button>
-       <div class="need-hint center">${((t) => L("needPct", t) + `${t ? ` <button class="mem-i" data-act="pass-info" title="${esc(L("passInfoTip"))}" aria-label="${esc(L("passInfoTip"))}">i</button>` : ""}`)(bs.attrs.vocab.tries || 0)}</div>`
+       <div class="need-hint center">${needHintHtml("vocab", bs.attrs.vocab.tries || 0)}</div>`
     : `<div class="solid"><div class="big" style="color:${retColor(sol)}">${Math.round(sol * 100)}%</div>
         <div><div>${L("solidity")}</div><div class="p-sub">${L("production", (brickRate(b) * 60).toFixed(1))}</div></div></div>
        <button class="btn btn-good btn-big full" data-act="review-brick">${L("reviewBrick")}</button>`;
@@ -526,7 +537,7 @@ function brickPanel(b) {
     }
     if (!a.learned) {
       return `<div class="attr">${topRow(`<span class="newbadge static">${L("toLearnBadge")}</span>`)}<div class="attr-desc">${attrDesc(at.id)}</div>
-        <div class="need-hint">${((t) => L("needPct", t) + `${t ? ` <button class="mem-i" data-act="pass-info" title="${esc(L("passInfoTip"))}" aria-label="${esc(L("passInfoTip"))}">i</button>` : ""}`)(a.tries || 0)}</div>
+        <div class="need-hint">${needHintHtml(at.id, a.tries || 0)}</div>
         <div class="attr-actions"><span></span><button class="btn btn-gold" data-act="learn-attr" data-attr="${at.id}">${a.tries ? L("retryLesson") : L("firstLesson")}</button></div></div>`;
     }
     const r = ret(a), left = a.last + a.hl - Date.now();
@@ -1332,14 +1343,19 @@ function quitSession() {
 }
 
 // Conditions de validation d'une première leçon (avec le score de l'essai raté, si fourni)
-function passRulesHtml(mine) {
-  return `<h4>${L("passTitle")}</h4>${L("passRules")}
-    ${mine ? `<div class="mem-this">${L("passMine", Math.round(mine.score * 100), Math.round(mine.total * 100))}</div>` : ""}
+function passRulesBody(aid) {
+  const [p1, p2] = passOf(aid);
+  return (PASS_BY_ATTR[aid] ? `<div class="mem-this oral-note">${L("oralPassNote", pct100(p1), pct100(p2))}</div>` : "")
+    + L("passRules", pct100(p1), pct100(p2), !PASS_BY_ATTR[aid]);
+}
+function passRulesHtml(mine, aid) {
+  return `<h4>${L("passTitle")}</h4>${passRulesBody(aid)}
+    ${mine ? `<div class="mem-this">${L("passMine", pct100(mine.score), pct100(mine.total))}</div>` : ""}
     <p>${L("passAfter")}</p>`;
 }
-function passInfoModal() {
+function passInfoModal(aid) {
   openModal(`<div class="m-head"><div class="m-tag grow">${L("passTitle")}</div><button class="m-close" data-x>✕</button></div>
-    <div class="m-body mem-info">${L("passRules")}<p>${L("passAfter")}</p></div>
+    <div class="m-body mem-info">${passRulesBody(aid)}<p>${L("passAfter")}</p></div>
     <div class="m-foot"><div class="fb"></div><button class="btn btn-gold btn-big" data-x2>${L("gotIt")}</button></div>`);
   $("#modal [data-x]").onclick = closeModal; $("#modal [data-x2]").onclick = closeModal;
   KEY = (e) => { if (e.key === "Enter") closeModal(); };
@@ -1355,8 +1371,9 @@ function finishSession() {
     if (!a.learned) {                         // première leçon : il faut atteindre le seuil
       const total = Math.min(1, (p.ok + (p.rok || 0)) / p.tot);
       a.tries = (a.tries || 0) + 1;
-      if (score + 1e-9 < PASS_FIRST && total + 1e-9 < PASS_CATCHUP) { p.failed = { score, total }; rows.push({ p, a, st: 0 }); continue; }
-      if (score + 1e-9 < PASS_FIRST) p.viaCatchup = true;
+      const [p1, p2] = passOf(p.aid);
+      if (score + 1e-9 < p1 && total + 1e-9 < p2) { p.failed = { score, total, p1, p2 }; rows.push({ p, a, st: 0 }); continue; }
+      if (score + 1e-9 < p1) p.viaCatchup = true;
       delete a.tries;
     }
     applyReview(a, score);
@@ -1381,8 +1398,8 @@ function finishSession() {
     if (p.failed) {
       return `<div class="res-row failed"><span class="res-ico">${b.icon}</span><div class="r-name">${at.icon} ${attrName(p.aid)} <span class="p-sub">· ${b.name}</span>
         <div class="r-hl">${L("notValidated")} <button class="mem-i" data-pass-i title="${esc(L("passInfoTip"))}" aria-label="${esc(L("passInfoTip"))}">i</button></div></div>
-        <div class="r-right"><div><b style="color:var(--bad)">${Math.round(p.failed.score * 100)}%</b> / ${PASS_FIRST * 100}%</div>
-          <div class="p-sub">🔁 ${Math.round(p.failed.total * 100)}% / ${PASS_CATCHUP * 100}%</div></div></div>`;
+        <div class="r-right"><div><b style="color:var(--bad)">${pct100(p.failed.score)}%</b> / ${pct100(p.failed.p1)}%</div>
+          <div class="p-sub">🔁 ${pct100(p.failed.total)}% / ${pct100(p.failed.p2)}%</div></div></div>`;
     }
     const before = p.wasLearned ? `${Math.round(p.rBefore * 100)}%` : L("isNew");
     const trend = !p.wasLearned ? "" : a.hl >= p.hlBefore ? `<span class="up">▲</span>` : `<span class="down">▼</span>`;
@@ -1394,7 +1411,7 @@ function finishSession() {
     <div class="m-body"><div class="res-head"><div class="res-face">${face}</div><div class="res-score">${pct}%</div>
       <div class="res-sub">${L("firstTry", maxCombo)}</div>
       <div class="res-gain">+${gained} 💡${bonus ? ` <span class="p-sub">${L("perfectBonus", bonus)}</span>` : ""}</div></div>
-      ${rowsHtml}${failed.length ? `<div class="pass-info hidden">${passRulesHtml(failed[0].p.failed)}</div>` : ""}
+      ${rowsHtml}${failed.length ? `<div class="pass-info hidden">${passRulesHtml(failed[0].p.failed, failed[0].p.aid)}</div>` : ""}
       <div class="p-sub res-tip">${failed.length ? L("firstFailTip") : pct < 70 ? L("lowScore") : L("goodScore")}</div></div>
     <div class="m-foot"><div class="fb"></div><button class="btn" data-again>${L("again")}</button><button class="btn btn-gold btn-big" data-close>${L("cont")}</button></div>`, "session");
   $("#modal [data-x]").onclick = closeModal;
@@ -1639,7 +1656,7 @@ function bind() {
     else if (act === "train") startSession([{ bid: b.id, aid: el.dataset.attr, n: 8 }], { title: L("practiceTitle", attrName(el.dataset.attr)) });
     else if (act === "say") speak(b.w[+el.dataset.i].tg);
     else if (act === "mem-info") memoryInfoModal(b, el.dataset.attr);
-    else if (act === "pass-info") passInfoModal();
+    else if (act === "pass-info") passInfoModal(el.dataset.attr);
   });
   // Écran des profils
   $("#screen").addEventListener("click", (e) => {

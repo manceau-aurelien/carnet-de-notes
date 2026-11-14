@@ -5,6 +5,19 @@
 // =====================================================================
 const CHANGELOG = [
   {
+    date: "2026-11-14", icon: "🎤",
+    fr: { title: "Oral : validation assouplie", items: [
+      "Le micro reconnaît encore mal certaines phrases, même bien prononcées : l'oral n'est pas tout à fait au point.",
+      "En attendant, la première leçon de <b>🎤 Oral</b> se valide avec <b>50 %</b> du premier coup, ou <b>60 %</b> avec le rattrapage (au lieu de 70 % et 90 %).",
+      "Un petit <b>i</b> sur la fiche de l'attribut l'explique. Les autres attributs ne changent pas.",
+    ] },
+    en: { title: "Speaking: easier to pass", items: [
+      "The microphone still misses some sentences, even when they're well pronounced: speaking isn't quite ready yet.",
+      "Meanwhile, the first <b>🎤 Speaking</b> lesson passes with <b>50%</b> on the first try, or <b>60%</b> with the catch-up round (instead of 70% and 90%).",
+      "A small <b>i</b> on the upgrade's card explains it. The other upgrades don't change.",
+    ] },
+  },
+  {
     date: "2026-11-13", icon: "🎯",
     fr: { title: "L'oral reste dans la brique", items: [
       "Les phrases à dire utilisent maintenant <b>les 10 mots de la brique</b>, et rien d'autre : l'oral sert à les répéter sous un autre angle.",
