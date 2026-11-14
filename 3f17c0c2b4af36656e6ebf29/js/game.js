@@ -504,20 +504,47 @@ function renderTree() {
     const p = BR[r], cls = owned(b.id) ? "on" : brickReqMet(b) ? "avail" : "";
     lines += `<line class="${cls}" x1="${p.x}%" y1="${nodeTop(p.y)}" x2="${b.x}%" y2="${nodeTop(b.y)}"/>`;
   }));
-  $("#links").innerHTML = lines + bossLinks();
+  $("#links").innerHTML = lines + bossLinks() + (open2 ? "" : ghostLinks());
   // Groupés par niveau : arbre positionné sur ordinateur, rangées empilées sur téléphone
   const tiers = (list) => list.map((t) => `<div class="tier"><div class="tier-label">${L("tier", t)}</div>
     <div class="tier-row">${BRICKS.filter((b) => b.tier === t).map(nodeHtml).join("")}</div></div>`).join("");
   $("#tree").classList.toggle("lvl2", open2);
+  $("#tree").classList.toggle("lvl2ghost", !open2);
   $("#nodes").innerHTML = tiers([0, 1, 2, 3])
     + `<div class="tier boss-tier"><div class="tier-label">${L("bossTier")}</div><div class="tier-row">${bossNodeHtml(BOSSES.boss)}</div></div>`
     + (open2 ? `<div class="lvl-sep" style="top:${nodeTop(117)}px"><span>${L("lvl2Title")}</span></div>` + tiers([4, 5, 6, 7])
-      + `<div class="tier boss-tier"><div class="tier-label">${L("bossTier")}</div><div class="tier-row">${bossNodeHtml(BOSSES.boss2)}</div></div>` : "");
+      + `<div class="tier boss-tier"><div class="tier-label">${L("bossTier")}</div><div class="tier-row">${bossNodeHtml(BOSSES.boss2)}</div></div>`
+    : ghostTiersHtml());
+}
+
+// Briques fantômes : on devine la suite du parcours, cachée derrière le Dragon des Mots
+const GHOST_TIERS = [4, 5];
+function ghostTiersHtml() {
+  const node = (b) => `<div class="node ghost${SEL.type === "ghost" && SEL.id === b.id ? " selected" : ""}" data-ghost="${b.id}" style="left:${b.x}%;top:${nodeTop(b.y)}px"
+    title="${esc(L("ghostTip"))}"><div class="ring"><div class="ring-in">${b.icon}</div></div>
+    <div class="n-name">${b.name}</div><div class="n-sub">${L("ghostSub")}</div></div>`;
+  return `<div class="lvl-sep ghost" style="top:${nodeTop(117)}px"><span>${L("lvl2Title")} 🔒</span></div>`
+    + GHOST_TIERS.map((t) => `<div class="tier ghost-tier"><div class="tier-label">${L("tier", t)}</div>
+      <div class="tier-row">${BRICKS.filter((b) => b.tier === t).map(node).join("")}</div></div>`).join("");
+}
+function ghostLinks() {
+  const b1 = BOSSES.boss, line = (a, b) => `<line class="ghost" x1="${a.x}%" y1="${nodeTop(a.y)}" x2="${b.x}%" y2="${nodeTop(b.y)}"/>`;
+  return BRICKS.filter((b) => GHOST_TIERS.includes(b.tier))
+    .map((b) => (b.req.length ? b.req.map((r) => line(BR[r], b)).join("") : line(b1, b))).join("");
+}
+function ghostPanel(b) {
+  const names = TENSE_IDS.map((id) => `${COURSE.tenses[id].icon} ${COURSE.tenses[id].name}`).join(", ");
+  return `<div class="p-head"><div class="p-ico ghost-ico">${b.icon}</div><div>
+      <div class="p-title">${b.name}</div><div class="p-sub">${L("lvl2Title")} · 🔒</div></div></div>
+    <div class="ghost-card"><div class="ghost-big">🐉</div><p class="p-text">${L("ghostText", names)}</p></div>
+    <div class="p-section"><button class="btn btn-bad btn-big full" data-act="see-boss">${L("ghostSeeBoss")}</button></div>
+    <div class="p-section"><button class="btn full" data-act="see-plan">${L("ghostPlan")}</button></div>`;
 }
 
 // ---------- Panneau latéral (feuille glissante sur mobile) ----------
 function renderPanel() {
-  $("#panel-body").innerHTML = SEL.type === "skill" ? skillPanel(SK[SEL.id]) : SEL.type === "boss" ? (BOSS = BOSSES[SEL.id] || BOSSES.boss, bossPanel()) : brickPanel(BR[SEL.id]);
+  if (SEL.type === "ghost" && lvl2Open()) SEL = { type: "brick", id: SEL.id };   // le dragon vient d'être vaincu
+  $("#panel-body").innerHTML = SEL.type === "ghost" ? ghostPanel(BR[SEL.id]) : SEL.type === "skill" ? skillPanel(SK[SEL.id]) : SEL.type === "boss" ? (BOSS = BOSSES[SEL.id] || BOSSES.boss, bossPanel()) : brickPanel(BR[SEL.id]);
 }
 function openSheet() { if (isNarrow()) { $("#panel").classList.add("open"); $("#sheet-bg").classList.remove("hidden"); } }
 function closeSheet() { $("#panel").classList.remove("open"); $("#sheet-bg").classList.add("hidden"); }
@@ -1726,6 +1753,8 @@ function bind() {
   $("#tree").addEventListener("click", (e) => {
     const bi = e.target.closest("[data-boss-info]");
     if (bi) { BOSS = BOSSES[bi.dataset.bossInfo] || BOSSES.boss; return bossRulesModal(); }
+    const gh = e.target.closest("[data-ghost]");
+    if (gh) { SEL = { type: "ghost", id: gh.dataset.ghost }; renderAll(); return openSheet(); }
     const bn = e.target.closest("[data-boss]");
     if (bn) { SEL = { type: "boss", id: bn.dataset.boss || "boss" }; renderAll(); return openSheet(); }
     const n = e.target.closest("[data-brick]"); if (!n) return;
@@ -1746,6 +1775,14 @@ function bind() {
       if (act === "boss-info") bossRulesModal();
       if (act === "boss-unlock") unlockBoss();
       if (act === "boss-fight") startBossIntro();
+      return;
+    }
+    if (SEL.type === "ghost") {
+      if (act === "see-plan") return roadmapModal();
+      if (act === "see-boss") {
+        SEL = { type: "boss", id: "boss" }; renderAll();
+        const n = $('[data-boss="boss"]'); if (n) n.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
       return;
     }
     if (SEL.type === "skill") {

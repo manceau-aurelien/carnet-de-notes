@@ -5,6 +5,17 @@
 // =====================================================================
 const CHANGELOG = [
   {
+    date: "2026-11-14", icon: "👻",
+    fr: { title: "On devine la suite", items: [
+      "Sous le Dragon des Mots, les premières briques du <b>niveau 2</b> apparaissent en fantômes.",
+      "Touche-en une : le jeu t'explique qu'il faut <b>vaincre le dragon</b> pour accéder à la suite du parcours.",
+    ] },
+    en: { title: "A glimpse of what's next", items: [
+      "Below the Word Dragon, the first <b>level 2</b> bricks now appear as ghosts.",
+      "Tap one: the game explains you need to <b>defeat the dragon</b> to reach the rest of the journey.",
+    ] },
+  },
+  {
     date: "2026-11-14", icon: "🐲",
     fr: { title: "Le Dragon du Temps garde le niveau 2", items: [
       "Tout en bas de l'arbre, un 2ᵉ boss garde la sortie du niveau 2 : le <b>🐲 Dragon du Temps</b>.",
