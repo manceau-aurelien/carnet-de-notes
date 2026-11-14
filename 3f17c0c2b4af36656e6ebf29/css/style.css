@@ -772,3 +772,6 @@ details.p-section summary h4 { display: inline; }
   .m-foot [data-keep] { flex: 1 1 0; min-width: 0; }
 }
 .oral-note { margin-bottom: 12px; border-color: rgba(255, 196, 0, .45); }
+.skill.future[data-roadmap] { cursor: pointer; }
+.skill.future[data-roadmap]:hover { opacity: .6; }
+.roadmap-lv p { margin: 4px 0 0; }

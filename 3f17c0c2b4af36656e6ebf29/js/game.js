@@ -430,8 +430,8 @@ function renderSkills() {
       <div><div class="s-name">${s.name}</div><div class="s-sub">${sub}</div></div></div>`;
   };
   const arrow = '<span class="arrow">›</span>';
-  const fut = COURSE.future.map((f) => `<div class="skill future" title="${esc(L("futureTip"))}"><span class="s-ico">${f.icon}</span>
-      <div><div class="s-name">${f.name}</div><div class="s-sub">${L("future")}</div></div></div>`).join(arrow);
+  const fut = `<div class="skill future" data-roadmap title="${esc(L("futureTip"))}"><span class="s-ico">🔭</span>
+      <div><div class="s-name">${L("futureName")}</div><div class="s-sub">${L("future")}</div></div></div>`;
   $("#skills-band").innerHTML = SKILLS.map(chip).join(arrow) + arrow + fut;
 }
 
@@ -1358,6 +1358,16 @@ function passRulesHtml(mine, aid) {
     ${mine ? `<div class="mem-this">${L("passMine", pct100(mine.score), pct100(mine.total))}</div>` : ""}
     <p>${L("passAfter")}</p>`;
 }
+// 🔭 Fenêtre « La suite » : les prochaines mises à jour prévues
+function roadmapModal() {
+  const lv = COURSE.roadmap.map((r) => `<h4>${r.icon} ${r.title}</h4>
+    <div class="mem-this roadmap-lv"><div class="p-sub">🐉 ${r.gate}</div>${r.items.map((x) => `<p>${x}</p>`).join("")}</div>`).join("");
+  openModal(`<div class="m-head"><div class="m-tag grow">🔭 ${L("roadmapTitle")}</div><button class="m-close" data-x>✕</button></div>
+    <div class="m-body mem-info"><p>${L("roadmapIntro")}</p>${lv}<p class="p-sub" style="margin-top:14px">${L("roadmapNote")}</p></div>
+    <div class="m-foot"><div class="fb"></div><button class="btn btn-gold btn-big" data-x2>${L("gotIt")}</button></div>`);
+  $("#modal [data-x]").onclick = closeModal; $("#modal [data-x2]").onclick = closeModal;
+  KEY = (e) => { if (e.key === "Enter") closeModal(); };
+}
 function passInfoModal(aid) {
   openModal(`<div class="m-head"><div class="m-tag grow">${L("passTitle")}</div><button class="m-close" data-x>✕</button></div>
     <div class="m-body mem-info">${passRulesBody(aid)}<p>${L("passAfter")}</p></div>
@@ -1633,6 +1643,7 @@ function bind() {
     SEL = { type: "brick", id: n.dataset.brick }; renderAll(); openSheet();
   });
   $("#skills-band").addEventListener("click", (e) => {
+    if (e.target.closest("[data-roadmap]")) return roadmapModal();
     const n = e.target.closest("[data-skill]"); if (!n) return;
     SEL = { type: "skill", id: n.dataset.skill }; renderAll(); openSheet();
   });

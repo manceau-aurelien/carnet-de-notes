@@ -340,10 +340,23 @@ COURSES.fr = {
     ] },
   },
 
-  future: [
-    { name: "Passé composé", icon: "⏪" },
-    { name: "Futur proche", icon: "⏩" },
-    { name: "Imparfait", icon: "⏳" },
+  // Plan after the Word Dragon ("What's next" window)
+  roadmap: [
+    { icon: "⏳", title: "Level 2: tenses", gate: "Guarded by a 2nd dragon", items: [
+      "New 10-word bricks, with 📖 Vocabulary and ✍️ Spelling.",
+      "Their other upgrades become <b>tenses</b>, still in all 3 forms (affirmative, negative, question):",
+      "⏪ <b>Passé composé</b>: <i>j'ai mangé</i>",
+      "⏩ <b>Futur proche</b>: <i>je vais manger</i>",
+      "⏳ <b>Imparfait</b>: <i>je mangeais</i>",
+    ] },
+    { icon: "🔗", title: "Level 3: linking sentences", gate: "Guarded by a 3rd dragon", items: [
+      "<b>Modal verbs</b>: <i>pouvoir, devoir, vouloir</i> + infinitive (<i>je peux nager</i>)",
+      "<b>Simple linking words</b>: <i>et, mais, parce que, donc</i>",
+    ] },
+    { icon: "🧩", title: "Level 4: two-part sentences", gate: "Guarded by a 4th dragon", items: [
+      "<i>si, quand, pendant que…</i>: choosing the right tense in each part of the sentence.",
+      "<i>S'il pleut, je vais rester à la maison.</i>",
+    ] },
   ],
 
   ranks: [

@@ -338,10 +338,23 @@ COURSES.en = {
     ] },
   },
 
-  future: [
-    { name: "Présent continu", icon: "⏳" },
-    { name: "Le passé", icon: "⏪" },
-    { name: "Le futur", icon: "⏩" },
+  // Programme prévu après le Dragon des Mots (fenêtre « La suite »)
+  roadmap: [
+    { icon: "⏳", title: "Niveau 2 : les temps", gate: "Gardé par un 2ᵉ dragon", items: [
+      "De nouvelles briques de 10 mots, avec 📖 Vocabulaire et ✍️ Orthographe.",
+      "Leurs autres attributs deviennent des <b>temps</b>, toujours aux 3 formes (affirmative, négative, question) :",
+      "⏳ <b>Présent continu</b> : <i>I am eating</i>",
+      "⏪ <b>Le passé</b> : <i>I ate, I was</i>",
+      "⏩ <b>Le futur</b> : <i>I will eat</i>",
+    ] },
+    { icon: "🔗", title: "Niveau 3 : relier ses phrases", gate: "Gardé par un 3ᵉ dragon", items: [
+      "Les <b>modaux</b> : <i>can, must, should…</i> (<i>I can swim</i>)",
+      "Les <b>liaisons simples</b> : <i>and, but, because, so</i>",
+    ] },
+    { icon: "🧩", title: "Niveau 4 : les phrases à deux morceaux", gate: "Gardé par un 4ᵉ dragon", items: [
+      "<i>if, when, while…</i> : choisir le bon temps dans chaque morceau de la phrase.",
+      "<i>If it rains, I will stay at home.</i>",
+    ] },
   ],
 
   ranks: [

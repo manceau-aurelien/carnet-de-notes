@@ -5,6 +5,17 @@
 // =====================================================================
 const CHANGELOG = [
   {
+    date: "2026-11-14", icon: "🔭",
+    fr: { title: "Le programme de la suite", items: [
+      "En haut de l'arbre, la brique <b>🔭 La suite</b> montre ce qui est prévu après le Dragon des Mots.",
+      "Niveau 2 : les <b>temps</b>. Niveau 3 : les <b>modaux</b> et les liaisons simples. Niveau 4 : les phrases avec <i>if / when</i>. Chaque niveau a son dragon.",
+    ] },
+    en: { title: "The plan for what's next", items: [
+      "At the top of the tree, the <b>🔭 What's next</b> brick shows what's planned after the Word Dragon.",
+      "Level 2: <b>tenses</b>. Level 3: <b>modal verbs</b> and simple linking words. Level 4: sentences with <i>si / quand</i>. Each level has its own dragon.",
+    ] },
+  },
+  {
     date: "2026-11-14", icon: "🎤",
     fr: { title: "Oral : validation assouplie", items: [
       "Le micro reconnaît encore mal certaines phrases, même bien prononcées : l'oral n'est pas tout à fait au point.",

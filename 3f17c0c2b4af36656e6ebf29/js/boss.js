@@ -30,7 +30,7 @@ Object.assign(STR.fr, {
   bossFight: "⚔️ Affronter le boss", bossHistory: "Dernières batailles",
   bossHistLine: (p, d) => `${p} % → ${d < 0 ? `<span class="up">${d} %</span>` : d > 0 ? `<span class="down">+${d} %</span>` : "aucun dégât"}`,
   bossDefeatedTitle: "🏆 Boss vaincu !", bossDefeatedText: (n, d) => `Tu as vaincu le Dragon des Mots en <b>${n}</b> tentative(s), le ${d}.`,
-  bossNext: "La suite de l'aventure (nouvelles briques, puis les <b>temps</b> : passé, futur…) arrive dans une prochaine mise à jour.",
+  bossNext: "La suite de l'aventure (de nouvelles briques avec les <b>temps</b> : passé, futur…) arrive dans une prochaine mise à jour. Touche 🔭 <b>La suite</b> en haut de l'arbre pour voir le programme.",
   bossRulesTitle: "Comment fonctionne le boss ?",
   bossRules: [
     "<b>🔓 Le débloquer</b><br>Valide au moins une fois : ❓ Interrogatif sur <b>3</b> briques, 🚫 Négatif sur <b>6</b>, ✅ Affirmatif sur <b>9</b> et ✍️ Orthographe sur <b>12</b>. Puis paie <b>10 000 💡</b>.",
@@ -66,7 +66,7 @@ Object.assign(STR.en, {
   bossFight: "⚔️ Fight the boss", bossHistory: "Latest battles",
   bossHistLine: (p, d) => `${p}% → ${d < 0 ? `<span class="up">${d}%</span>` : d > 0 ? `<span class="down">+${d}%</span>` : "no damage"}`,
   bossDefeatedTitle: "🏆 Boss defeated!", bossDefeatedText: (n, d) => `You defeated the Word Dragon in <b>${n}</b> attempt(s), on ${d}.`,
-  bossNext: "The rest of the adventure (new bricks, then <b>tenses</b>: past, future…) is coming in a future update.",
+  bossNext: "The rest of the adventure (new bricks with <b>tenses</b>: past, future…) is coming in a future update. Tap 🔭 <b>What's next</b> at the top of the tree to see the plan.",
   bossRulesTitle: "How does the boss work?",
   bossRules: [
     "<b>🔓 Unlocking it</b><br>Complete at least once: ❓ Questions on <b>3</b> bricks, 🚫 Negative on <b>6</b>, ✅ Affirmative on <b>9</b> and ✍️ Spelling on <b>12</b>. Then pay <b>10,000 💡</b>.",

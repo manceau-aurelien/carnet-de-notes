@@ -31,7 +31,10 @@ const STR = {
     erodedTip: (n) => `${n} attribut(s) érodé(s)`,
     pipNone: (a) => `${a} : non greffé`,
     pipToLearn: (a) => `${a} : à apprendre`,
-    skillOwned: "✔ acquise", skillLocked: "🔒 verrouillée", future: "bientôt (V2)", futureTip: "Prévu pour une prochaine version",
+    skillOwned: "✔ acquise", skillLocked: "🔒 verrouillée", futureName: "La suite", future: "prochaines mises à jour", futureTip: "Voir ce qui est prévu",
+    roadmapTitle: "Prochaines mises à jour",
+    roadmapIntro: "Voici ce qui est prévu <b>après le Dragon des Mots</b>. Chaque niveau est gardé par un nouveau dragon : il faut le battre pour passer au suivant.",
+    roadmapNote: "C'est le programme prévu : l'ordre et le contenu peuvent encore évoluer.",
 
     // Panneau compétence
     grammarSkill: "Compétence de grammaire",
@@ -285,7 +288,10 @@ const STR = {
     erodedTip: (n) => `${n} eroded upgrade(s)`,
     pipNone: (a) => `${a}: not added`,
     pipToLearn: (a) => `${a}: to learn`,
-    skillOwned: "✔ learned", skillLocked: "🔒 locked", future: "coming soon (V2)", futureTip: "Planned for a future version",
+    skillOwned: "✔ learned", skillLocked: "🔒 locked", futureName: "What's next", future: "upcoming updates", futureTip: "See what's planned",
+    roadmapTitle: "Upcoming updates",
+    roadmapIntro: "Here's what's planned <b>after the Word Dragon</b>. Each level is guarded by a new dragon: beat it to move on to the next one.",
+    roadmapNote: "This is the plan: the order and content may still change.",
 
     grammarSkill: "Grammar lesson",
     skillUnlocks: (ico, n) => `Unlocks the <b>${ico} ${n}</b> upgrade on <b>all</b> your vocabulary bricks. You can then add it brick by brick.`,
