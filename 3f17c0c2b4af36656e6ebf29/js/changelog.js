@@ -5,6 +5,21 @@
 // =====================================================================
 const CHANGELOG = [
   {
+    date: "2026-11-14", icon: "🐲",
+    fr: { title: "Le Dragon du Temps garde le niveau 2", items: [
+      "Tout en bas de l'arbre, un 2ᵉ boss garde la sortie du niveau 2 : le <b>🐲 Dragon du Temps</b>.",
+      "Pour le débloquer, valide sur les briques du niveau 2 : ⏩ le 3ᵉ temps sur <b>3</b> briques, ⏪ le 2ᵉ sur <b>6</b>, ⏳ le 1ᵉʳ sur <b>9</b> et ✍️ Orthographe sur <b>12</b>, puis paie <b>30 000 💡</b>.",
+      "Mêmes règles que le Dragon des Mots : 20 questions sur tout le niveau 2 (traductions au clavier, dictées, oral et exercices), sans seconde chance.",
+      "Le vaincre ouvrira le niveau 3 (relier ses phrases) dès qu'il sera prêt.",
+    ] },
+    en: { title: "The Time Dragon guards level 2", items: [
+      "At the very bottom of the tree, a 2nd boss guards the way out of level 2: the <b>🐲 Time Dragon</b>.",
+      "To unlock it, complete on level 2 bricks: the 3rd tense on <b>3</b> bricks, the 2nd on <b>6</b>, the 1st on <b>9</b> and ✍️ Spelling on <b>12</b>, then pay <b>30,000 💡</b>.",
+      "Same rules as the Word Dragon: 20 questions on all of level 2 (typed translations, dictations, speaking and exercises), no second chances.",
+      "Defeating it will open level 3 (linking sentences) as soon as it's ready.",
+    ] },
+  },
+  {
     date: "2026-11-14", icon: "⏳",
     fr: { title: "Le niveau 2 est ouvert : les temps", items: [
       "Après le <b>Dragon des Mots</b>, l'arbre continue : <b>12 nouvelles briques</b> (le temps qui passe, les jours, les nombres de 11 à 20, la météo, la ville, les transports, les loisirs…).",

@@ -205,6 +205,7 @@ function progressSummary(p) {
       bricks: Object.keys(st.bricks).length, attrs, stars: starsTot, skills: Object.keys(st.skills).length,
       active: st.lastActive || null, started: !!st.started,
       boss: st.boss && st.boss.unlocked ? { hp: st.boss.hp, defeated: !!st.boss.defeated } : null,
+      boss2: st.boss2 && st.boss2.unlocked ? { hp: st.boss2.hp, defeated: !!st.boss2.defeated } : null,
     };
   }
   return out;
@@ -555,6 +556,7 @@ function friendCards(f) {
     return `<div class="fpath">${c.flag}<div class="f-main"><div><b>${PATH_NAMES[k][UI]}</b> · ${esc(rk)}</div>
       <div class="fp-stats"><span>🎖️ ${s.xp} XP</span><span>🔥 ${streak}</span><span>🧱 ${s.bricks}/${c.bricks.length}</span><span>✨ ${s.attrs}/${c.bricks.reduce((n, b) => n + attrsOf(b).length, 0)}</span><span>⭐ ${s.stars}</span><span>💡 ${fmt(s.savoir)}</span></div>
       ${s.boss ? `<div class="fp-boss">${s.boss.defeated ? L("friendBossWon") : L("friendBoss", s.boss.hp)}</div>` : ""}
+      ${s.boss2 ? `<div class="fp-boss">${s.boss2.defeated ? L("friendBossWon2") : L("friendBoss2", s.boss2.hp)}</div>` : ""}
       <div class="p-sub">${L("lastSession", fmtAgo(s.active))}</div></div></div>`;
   }).join("");
 }

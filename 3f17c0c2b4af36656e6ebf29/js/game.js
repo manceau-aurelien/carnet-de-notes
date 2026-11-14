@@ -510,13 +510,14 @@ function renderTree() {
     <div class="tier-row">${BRICKS.filter((b) => b.tier === t).map(nodeHtml).join("")}</div></div>`).join("");
   $("#tree").classList.toggle("lvl2", open2);
   $("#nodes").innerHTML = tiers([0, 1, 2, 3])
-    + `<div class="tier boss-tier"><div class="tier-label">${L("bossTier")}</div><div class="tier-row">${bossNodeHtml()}</div></div>`
-    + (open2 ? `<div class="lvl-sep" style="top:${nodeTop(117)}px"><span>${L("lvl2Title")}</span></div>` + tiers([4, 5, 6, 7]) : "");
+    + `<div class="tier boss-tier"><div class="tier-label">${L("bossTier")}</div><div class="tier-row">${bossNodeHtml(BOSSES.boss)}</div></div>`
+    + (open2 ? `<div class="lvl-sep" style="top:${nodeTop(117)}px"><span>${L("lvl2Title")}</span></div>` + tiers([4, 5, 6, 7])
+      + `<div class="tier boss-tier"><div class="tier-label">${L("bossTier")}</div><div class="tier-row">${bossNodeHtml(BOSSES.boss2)}</div></div>` : "");
 }
 
 // ---------- Panneau latéral (feuille glissante sur mobile) ----------
 function renderPanel() {
-  $("#panel-body").innerHTML = SEL.type === "skill" ? skillPanel(SK[SEL.id]) : SEL.type === "boss" ? bossPanel() : brickPanel(BR[SEL.id]);
+  $("#panel-body").innerHTML = SEL.type === "skill" ? skillPanel(SK[SEL.id]) : SEL.type === "boss" ? (BOSS = BOSSES[SEL.id] || BOSSES.boss, bossPanel()) : brickPanel(BR[SEL.id]);
 }
 function openSheet() { if (isNarrow()) { $("#panel").classList.add("open"); $("#sheet-bg").classList.remove("hidden"); } }
 function closeSheet() { $("#panel").classList.remove("open"); $("#sheet-bg").classList.add("hidden"); }
@@ -1723,8 +1724,10 @@ function choosePathModal(PL, onPick) {
 // =====================================================================
 function bind() {
   $("#tree").addEventListener("click", (e) => {
-    if (e.target.closest("[data-boss-info]")) return bossRulesModal();
-    if (e.target.closest("[data-boss]")) { SEL = { type: "boss" }; renderAll(); return openSheet(); }
+    const bi = e.target.closest("[data-boss-info]");
+    if (bi) { BOSS = BOSSES[bi.dataset.bossInfo] || BOSSES.boss; return bossRulesModal(); }
+    const bn = e.target.closest("[data-boss]");
+    if (bn) { SEL = { type: "boss", id: bn.dataset.boss || "boss" }; renderAll(); return openSheet(); }
     const n = e.target.closest("[data-brick]"); if (!n) return;
     SEL = { type: "brick", id: n.dataset.brick }; renderAll(); openSheet();
   });
@@ -1739,6 +1742,7 @@ function bind() {
     const el = e.target.closest("[data-act]"); if (!el || el.disabled || !S) return;
     const act = el.dataset.act;
     if (SEL.type === "boss") {
+      BOSS = BOSSES[SEL.id] || BOSSES.boss;
       if (act === "boss-info") bossRulesModal();
       if (act === "boss-unlock") unlockBoss();
       if (act === "boss-fight") startBossIntro();

@@ -776,7 +776,7 @@ details.p-section summary h4 { display: inline; }
 .skill.future[data-roadmap]:hover { opacity: .6; }
 .roadmap-lv p { margin: 4px 0 0; }
 /* Niveau 2 : l'arbre s'allonge sous le dragon */
-#tree.lvl2 { height: 1620px; }
+#tree.lvl2 { height: 1820px; }
 .lvl-sep { position: absolute; left: 0; right: 0; text-align: center; pointer-events: none; }
 .lvl-sep span { display: inline-block; padding: 6px 16px; border-radius: 999px; border: 1px solid rgba(255, 196, 0, .45);
   background: var(--card); color: var(--gold); font-weight: 700; font-size: 13px; letter-spacing: .5px; }

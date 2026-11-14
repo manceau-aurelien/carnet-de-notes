@@ -22,6 +22,7 @@ function testFullPath(course) {
   }
   for (const s of SKILL_DEF) st.skills[s.id] = true;
   st.boss = { unlocked: true, hp: 100, attempts: 0, best: 0, defeated: false, history: [] };
+  st.boss2 = { unlocked: true, hp: 100, attempts: 0, best: 0, defeated: false, history: [] };
   return st;
 }
 
@@ -43,6 +44,8 @@ function openTestMenu() {
     ["week", "⏳ Faire passer 7 jours (érosion)"],
     ["boss5", "🐉 Boss presque vaincu (5 % de vie)"],
     ["boss100", "🐉 Boss à 100 %, pas encore débloqué"],
+    ["boss2_5", "🐲 Dragon du Temps presque vaincu (5 % de vie)"],
+    ["boss2_100", "🐲 Dragon du Temps à 100 %, pas encore débloqué"],
     ["news", "📜 Revoir les nouveautés comme jamais lues"],
     ["wipe", "🗑️ Effacer toute la sauvegarde de test"],
   ];
@@ -65,8 +68,10 @@ function testAction(k) {
   if (k === "cash") { S.savoir += 10000; S.earned += 10000; }
   if (k === "day") age(DAY);
   if (k === "week") age(7 * DAY);
-  if (k === "boss5") Object.assign(bossState(), { unlocked: true, hp: 5, defeated: false });
-  if (k === "boss100") Object.assign(bossState(), { unlocked: false, hp: 100, defeated: false, attempts: 0, best: 0, history: [] });
+  if (k === "boss5") Object.assign(bossState(S, BOSSES.boss), { unlocked: true, hp: 5, defeated: false });
+  if (k === "boss100") Object.assign(bossState(S, BOSSES.boss), { unlocked: false, hp: 100, defeated: false, attempts: 0, best: 0, history: [] });
+  if (k === "boss2_5") Object.assign(bossState(S, BOSSES.boss2), { unlocked: true, hp: 5, defeated: false });
+  if (k === "boss2_100") Object.assign(bossState(S, BOSSES.boss2), { unlocked: false, hp: 100, defeated: false, attempts: 0, best: 0, history: [] });
   if (k === "news") { delete ROOT.newsSeen; }
   if (k === "wipe") { localStorage.removeItem(ROOT_KEY); return location.reload(); }
   closeModal(); renderStatic(); renderAll();
