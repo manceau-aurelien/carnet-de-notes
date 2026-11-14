@@ -13,8 +13,8 @@ const BASE_HL = 15 * MIN;          // demi-vie après la 1re leçon (≈15-21 mi
 const MIN_HL = 5 * MIN;
 const MAX_HL = 120 * DAY;
 const STAR_HL = [10 * MIN, HOUR, 6 * HOUR, DAY, 5 * DAY]; // seuils des étoiles
-const ATTR_WEIGHT = { vocab: 1, spell: 1.2, oral: 1.35, aff: 1.5, neg: 2, q: 2.5 };
-const BRICK_COST = [0, 25, 70, 150];
+const ATTR_WEIGHT = { vocab: 1, spell: 1.2, oral: 1.35, aff: 1.5, neg: 2, q: 2.5, t1: 1.5, t2: 2, t3: 2.5 };
+const BRICK_COST = [0, 25, 70, 150, 300, 450, 650, 900];
 const FORM = { aff: 0, neg: 1, q: 2 };
 const OFFLINE_CAP = 12 * HOUR;
 const MAX_PROFILES = 8;
@@ -35,6 +35,19 @@ const LAYOUT = {
   house: { x: 14, y: 74, tier: 3, req: ["family"] },
   body: { x: 50, y: 74, tier: 3, req: ["animals"] },
   clothes: { x: 84, y: 74, tier: 3, req: ["food"] },
+  // Niveau 2 (sous le Dragon des Mots) : les temps
+  time: { x: 50, y: 130, tier: 4, req: [] },
+  days: { x: 20, y: 154, tier: 5, req: ["time"] },
+  actions: { x: 50, y: 154, tier: 5, req: ["time"] },
+  numbers2: { x: 80, y: 154, tier: 5, req: ["time"] },
+  weather: { x: 10, y: 178, tier: 6, req: ["days"] },
+  moves: { x: 36, y: 178, tier: 6, req: ["actions"] },
+  talk: { x: 64, y: 178, tier: 6, req: ["actions"] },
+  feelings: { x: 90, y: 178, tier: 6, req: ["numbers2"] },
+  hobbies: { x: 10, y: 202, tier: 7, req: ["weather"] },
+  city: { x: 30, y: 202, tier: 7, req: ["moves"] },
+  transport: { x: 50, y: 202, tier: 7, req: ["moves"] },
+  qwords: { x: 76, y: 202, tier: 7, req: ["talk"] },
 };
 // Attributs, dans l'ordre où on les greffe
 const ATTRS = [
@@ -45,12 +58,21 @@ const ATTRS = [
   { id: "neg", icon: "🚫", cost: 55, skill: "neg" },
   { id: "q", icon: "❓", cost: 80, skill: "q" },
 ];
-const AT = Object.fromEntries(ATTRS.map((a) => [a.id, a]));
+// Niveau 2 : 📖 ✍️ 🎤 puis trois TEMPS (t1, t2, t3), chacun aux 3 formes (icône et nom propres au parcours)
+const TENSE_IDS = ["t1", "t2", "t3"];
+const isTense = (id) => TENSE_IDS.includes(id);
+const ATTRS2 = [ATTRS[0], ATTRS[1], ATTRS[2],
+  { id: "t1", icon: "⏳", cost: 35, skill: "t1" }, { id: "t2", icon: "⏪", cost: 55, skill: "t2" }, { id: "t3", icon: "⏩", cost: 80, skill: "t3" }];
+const attrsOf = (b) => (b.lvl === 2 ? ATTRS2 : ATTRS);
+const AT = Object.fromEntries([...ATTRS, ...ATTRS2].map((a) => [a.id, a]));
 const SKILL_DEF = [
   { id: "spell", cost: 15, req: { bricks: ["basics"], skills: [] } },
   { id: "aff", cost: 40, req: { bricks: ["pronouns"], skills: ["spell"] } },
   { id: "neg", cost: 100, req: { bricks: ["verbs"], skills: ["aff"] } },
   { id: "q", cost: 180, req: { bricks: [], skills: ["neg"] } },
+  { id: "t1", lvl: 2, cost: 300, req: { bricks: ["time"], skills: [] } },
+  { id: "t2", lvl: 2, cost: 700, req: { bricks: ["actions"], skills: ["t1"] } },
+  { id: "t3", lvl: 2, cost: 1200, req: { bricks: ["talk"], skills: ["t2"] } },
 ];
 
 // Drapeaux dessinés en SVG (Windows n'affiche pas les drapeaux emoji)
@@ -83,7 +105,18 @@ for (const c of Object.values(COURSES)) {
       const [a, n] = s.split("||");
       return { tg: a.split("|").map((x) => x.trim()), nat: n.split("|").map((x) => x.trim()) };
     });
+    b.lvl = b.lvl || 1;
+    b.t = {};
+    for (const k in b.tenses || {}) b.t[k] = b.tenses[k].map((s) => {
+      const [a, n] = s.split("||");
+      return { tg: a.split("|").map((x) => x.trim()), nat: n.split("|").map((x) => x.trim()) };
+    });
   });
+  // Familles de formes d'un même verbe (went/go/goes, mangé/manger…) : pièges des exercices de temps
+  c.TFAM = {};
+  (c.tenseForms || []).forEach((f) => f.forEach((w) => {
+    c.TFAM[w] = [...new Set([...(c.TFAM[w] || []), ...f.filter((x) => x !== w)])];
+  }));
   c.BR = Object.fromEntries(c.bricks.map((b) => [b.id, b]));
   c.SKILLS = SKILL_DEF.map((d) => ({ ...d, ...c.skills[d.id] }));
   c.SK = Object.fromEntries(c.SKILLS.map((s) => [s.id, s]));
@@ -101,8 +134,8 @@ function tr(lang, key, ...a) {
   return typeof v === "function" ? v(...a) : v;
 }
 const L = (key, ...a) => tr(UI, key, ...a);
-const attrName = (id) => STR[UI].attr[id][0];
-const attrDesc = (id) => STR[UI].attr[id][1];
+const attrName = (id) => (isTense(id) ? COURSE.tenses[id].name : STR[UI].attr[id][0]);
+const attrDesc = (id) => (isTense(id) ? COURSE.tenses[id].desc : STR[UI].attr[id][1]);
 
 // ---------- Utilitaires ----------
 const rnd = (n) => Math.floor(Math.random() * n);
@@ -142,7 +175,7 @@ const isNarrow = () => matchMedia("(max-width: 1100px)").matches;
 // ---------- Phrases -> jetons (tuiles) ----------
 function tok(s) {
   return s.replace(/\s*[.?!]+$/, "").split(/\s+/)
-    .map((w) => (COURSE.target === "en" && (w === "I" || /^I'/.test(w)) ? w : w.toLowerCase()));
+    .map((w, i) => ((COURSE.target === "en" && (w === "I" || /^I'/.test(w))) || (i > 0 && /^\p{Lu}/u.test(w)) ? w : w.toLowerCase()));
 }
 function suffix(s) { const m = s.match(/\s*[.?!]+$/); return m ? m[0] : ""; }
 function show(tokens, suf) { const s = tokens.join(" "); return s.charAt(0).toUpperCase() + s.slice(1) + suf; }
@@ -231,8 +264,11 @@ function applyReview(a, score, aid) {
 
 // ---------- Débloquages ----------
 const owned = (id) => !!S.bricks[id];
-const brickReqMet = (b) => b.req.every(owned);
-const skillReqMet = (s) => s.req.bricks.every(owned) && s.req.skills.every((x) => S.skills[x]);
+// Le niveau 2 s'ouvre quand le Dragon des Mots est vaincu (tout est ouvert sur le site de test)
+const lvl2Open = () => !!(window.BRICKS_TEST || (S && S.boss && S.boss.defeated));
+const shownBricks = () => BRICKS.filter((b) => b.lvl !== 2 || lvl2Open());
+const brickReqMet = (b) => (b.lvl !== 2 || lvl2Open()) && b.req.every(owned);
+const skillReqMet = (s) => (s.lvl !== 2 || lvl2Open()) && s.req.bricks.every(owned) && s.req.skills.every((x) => S.skills[x]);
 const brickCost = (b) => BRICK_COST[b.tier];
 const attrCost = (b, at) => Math.round(at.cost * (1 + b.tier * 0.5));
 function attrLockReason(b, at) {
@@ -240,10 +276,11 @@ function attrLockReason(b, at) {
   if (at.skill && !S.skills[at.skill]) return L("needSkill", SK[at.skill].icon, SK[at.skill].name);
   if (at.id === "oral" && !CAN_LISTEN) return L("noMicSupport");
   // Chaîne : l'attribut précédent doit avoir été terminé au moins une fois (l'érosion ne retire pas l'accès)
-  let k = ATTRS.indexOf(at);
-  if (k > 0 && ATTRS[k - 1].id === "oral" && !CAN_LISTEN) k--;   // sans micro, l'oral ne bloque pas la suite
+  const list = attrsOf(b);
+  let k = list.indexOf(at);
+  if (k > 0 && list[k - 1].id === "oral" && !CAN_LISTEN) k--;   // sans micro, l'oral ne bloque pas la suite
   if (k > 0) {
-    const prev = ATTRS[k - 1], pa = bs.attrs[prev.id];
+    const prev = list[k - 1], pa = bs.attrs[prev.id];
     if (!pa || !pa.learned) return L("needPrev", prev.icon, attrName(prev.id));
   }
   return null;
@@ -432,7 +469,7 @@ function renderSkills() {
   const arrow = '<span class="arrow">›</span>';
   const fut = `<div class="skill future" data-roadmap title="${esc(L("futureTip"))}"><span class="s-ico">🔭</span>
       <div><div class="s-name">${L("futureName")}</div><div class="s-sub">${L("future")}</div></div></div>`;
-  $("#skills-band").innerHTML = SKILLS.map(chip).join(arrow) + arrow + fut;
+  $("#skills-band").innerHTML = SKILLS.filter((s) => s.lvl !== 2 || lvl2Open()).map(chip).join(arrow) + arrow + fut;
 }
 
 function nodeHtml(b) {
@@ -444,7 +481,7 @@ function nodeHtml(b) {
     const er = Object.values(bs.attrs).filter((a) => a.learned && ret(a) < 0.5).length;
     if (er) extra = `<span class="crack" title="${esc(L("erodedTip", er))}">!</span>`;
     else if (!bs.attrs.vocab.learned) extra = `<span class="newbadge">NEW</span>`;
-    pips = ATTRS.map((at) => {
+    pips = attrsOf(b).map((at) => {
       const a = bs.attrs[at.id], nm = attrName(at.id);
       if (!a) return `<span class="pip" title="${esc(L("pipNone", nm))}"></span>`;
       if (!a.learned) return `<span class="pip" style="border-color:var(--gold)" title="${esc(L("pipToLearn", nm))}"></span>`;
@@ -462,15 +499,19 @@ function nodeHtml(b) {
 
 function renderTree() {
   let lines = "";
-  BRICKS.forEach((b) => b.req.forEach((r) => {
+  const open2 = lvl2Open();
+  shownBricks().forEach((b) => b.req.forEach((r) => {
     const p = BR[r], cls = owned(b.id) ? "on" : brickReqMet(b) ? "avail" : "";
     lines += `<line class="${cls}" x1="${p.x}%" y1="${nodeTop(p.y)}" x2="${b.x}%" y2="${nodeTop(b.y)}"/>`;
   }));
   $("#links").innerHTML = lines + bossLinks();
   // Groupés par niveau : arbre positionné sur ordinateur, rangées empilées sur téléphone
-  $("#nodes").innerHTML = [0, 1, 2, 3].map((t) => `<div class="tier"><div class="tier-label">${L("tier", t)}</div>
-    <div class="tier-row">${BRICKS.filter((b) => b.tier === t).map(nodeHtml).join("")}</div></div>`).join("")
-    + `<div class="tier boss-tier"><div class="tier-label">${L("bossTier")}</div><div class="tier-row">${bossNodeHtml()}</div></div>`;
+  const tiers = (list) => list.map((t) => `<div class="tier"><div class="tier-label">${L("tier", t)}</div>
+    <div class="tier-row">${BRICKS.filter((b) => b.tier === t).map(nodeHtml).join("")}</div></div>`).join("");
+  $("#tree").classList.toggle("lvl2", open2);
+  $("#nodes").innerHTML = tiers([0, 1, 2, 3])
+    + `<div class="tier boss-tier"><div class="tier-label">${L("bossTier")}</div><div class="tier-row">${bossNodeHtml()}</div></div>`
+    + (open2 ? `<div class="lvl-sep" style="top:${nodeTop(117)}px"><span>${L("lvl2Title")}</span></div>` + tiers([4, 5, 6, 7]) : "");
 }
 
 // ---------- Panneau latéral (feuille glissante sur mobile) ----------
@@ -485,6 +526,7 @@ function reqLine(ok, txt) { return `<div class="req ${ok ? "ok" : "ko"}">${ok ? 
 function skillPanel(s) {
   const has = S.skills[s.id];
   const reqs = [
+    ...(s.lvl === 2 ? [reqLine(lvl2Open(), L("reqDragon"))] : []),
     ...s.req.bricks.map((id) => reqLine(owned(id), L("reqBrick", BR[id].icon, BR[id].name))),
     ...s.req.skills.map((id) => reqLine(!!S.skills[id], L("reqSkill", SK[id].icon, SK[id].name))),
   ];
@@ -493,7 +535,7 @@ function skillPanel(s) {
     : `<button class="btn btn-gold btn-big full" data-act="unlock-skill" ${can ? "" : "disabled"}>${L("learnFor", s.cost)}</button>`;
   return `<div class="p-head"><div class="p-ico">${s.icon}</div><div>
       <div class="p-title">${s.name}</div><div class="p-sub">${L("grammarSkill")}</div></div></div>
-    <div class="p-text">${L("skillUnlocks", AT[s.id].icon, attrName(s.id))}</div>
+    <div class="p-text">${L(s.lvl === 2 ? "skillUnlocks2" : "skillUnlocks", AT[s.id].icon, attrName(s.id))}</div>
     ${reqs.length ? `<div class="p-section"><h4>${L("prereqs")}</h4>${reqs.join("")}</div>` : ""}
     <div class="p-section">${action}</div>
     ${has ? `<div class="p-section"><h4>${L("memo")}</h4><div class="p-text">${s.lesson.map((l) => `<p>${l}</p>`).join("")}</div></div>` : ""}`;
@@ -530,7 +572,7 @@ function brickPanel(b) {
         <div><div>${L("solidity")}</div><div class="p-sub">${L("production", (brickRate(b) * 60).toFixed(1))}</div></div></div>
        <button class="btn btn-good btn-big full" data-act="review-brick">${L("reviewBrick")}</button>`;
 
-  const attrs = ATTRS.map((at) => {
+  const attrs = attrsOf(b).map((at) => {
     const a = bs.attrs[at.id], nm = attrName(at.id);
     const topRow = (extra = "") => `<div class="attr-top"><span class="attr-ico">${at.icon}</span><span class="attr-name">${nm}</span>${extra}</div>`;
     if (!a) {
@@ -706,7 +748,12 @@ function openAttrIntro(b, at) {
   const go = () => startSession([{ bid: b.id, aid: at.id, n: 8 }], { title: L("firstLessonTitle", attrName(at.id)) });
   if (at.id === "vocab") return openDiscovery(b);
   if (at.id === "spell") return slides([L("spellIntro", b.icon, b.name)], { icon: "✍️", title: attrName("spell"), onEnd: go });
-  if (at.id === "oral") return slides(L("oralIntro"), { icon: "🎤", title: attrName("oral"), onEnd: go });
+  if (at.id === "oral") return slides(b.lvl === 2 ? [...L("oralIntro2"), ...L("oralIntro").slice(1)] : L("oralIntro"), { icon: "🎤", title: attrName("oral"), onEnd: go });
+  if (isTense(at.id)) {
+    const s = SK[at.id];
+    const ex = shuffle(b.t[at.id]).slice(0, 3).map((x, k) => `<i>${x.tg[k]}</i><br><span class="ex-nat">${x.nat[k]}</span>`).join("<br><br>");
+    return slides([...s.lesson.slice(1), L("examples", b.icon, b.name, ex)], { icon: at.icon, title: L("recap", s.name), onEnd: go });
+  }
   const f = FORM[at.id], s = SK[at.id];
   const ex = shuffle(b.s).slice(0, 2).map((x) => `<i>${x.tg[f]}</i><br><span class="ex-nat">${x.nat[f]}</span>`).join("<br><br>");
   slides([...s.lesson.slice(1), L("examples", b.icon, b.name, ex)], { icon: at.icon, title: L("recap", s.name), onEnd: go });
@@ -745,12 +792,23 @@ const EN_VERBS = { like: "likes", love: "loves", want: "wants", have: "has", eat
 const EN_VERBS_INV = Object.fromEntries(Object.entries(EN_VERBS).map(([a, b]) => [b, a]));
 const EN_SW = { "don't": ["doesn't"], "doesn't": ["don't"], do: ["does"], does: ["do"], is: ["are", "am"], are: ["is"], am: ["is", "are"] };
 
-function corruptEN(sent, f) {
+function corruptEN(sent, f, tense = false) {
   const t = tok(sent.tg[f]), out = new Set(), add = (c) => out.add(c.join(" "));
   t.forEach((w, i) => {
     const reps = EN_SW[w] || (EN_VERBS[w] ? [EN_VERBS[w]] : EN_VERBS_INV[w] ? [EN_VERBS_INV[w]] : []);
     reps.forEach((r) => { const c = [...t]; c[i] = r; add(c); });
   });
+  if (tense) {
+    // went ↔ go, eating ↔ eat, didn't ↔ don't… ; « is eating » sans « is » ; « will to eat »
+    t.forEach((w, i) => (COURSE.TFAM[w] || []).forEach((r) => { const c = [...t]; c[i] = r; add(c); }));
+    t.forEach((w, i) => { if (/ing$/.test(w) && i > 0 && ["am", "is", "are", "was", "were"].includes(t[i - 1])) add(t.filter((_, k) => k !== i - 1)); });
+    ["will", "won't"].forEach((x) => {
+      const i = t.indexOf(x); if (i < 0 || !t[i + 1]) return;
+      if (t[i + 1] === "be") ["is", "are"].forEach((r) => { const c = [...t]; c[i + 1] = r; add(c); });   // will is ready
+      else { const c = [...t]; c.splice(i + 1, 0, "to"); add(c); }                                         // will to eat
+    });
+    if (t[0] === "did") add(t.slice(1));
+  }
   if (f === 0) {
     // Oublier « be » (The sky blue) ou l'ajouter devant un verbe (He is plays)
     const b = t.findIndex((w) => ["is", "are", "am"].includes(w));
@@ -800,8 +858,31 @@ const FR_DET = new Set(["le", "la", "les", "l'", "un", "une", "des", "mon", "ma"
 const FR_ELIDE = { "j'": "je", "l'": "le", "n'": "ne", "d'": "de", "c'": "ce", "qu'": "que" };
 const VOWEL = /^[aeiouyhéèêëàâîïôûù]/;
 
-function corruptFR(sent, f) {
+const FR_AUX_SWAP = { ai: "suis", as: "es", a: "est", avons: "sommes", avez: "êtes", ont: "sont",
+  suis: "ai", es: "as", est: "a", sommes: "avons", "êtes": "avez", sont: "ont" };
+function corruptFR(sent, f, tense = false) {
   const t = tok(sent.tg[f]), out = new Set(), add = (c) => out.add(c.join(" "));
+  if (tense) {
+    const TF = COURSE.TFAM;
+    t.forEach((w, i) => {
+      const m = w.match(/^(j'|n'|qu')(.+)$/), pre = m ? m[1] : "", core = m ? m[2] : w;
+      // mangé ↔ manger ↔ mange, allé ↔ allée, jouait ↔ jouais… (pas pour un nom : « cet été », « au marché »)
+      if (!FR_DET.has(t[i - 1]) && !["ce", "cet", "cette", "en"].includes(t[i - 1]))
+        (TF[core] || []).filter((x) => !pre || VOWEL.test(x)).forEach((x) => { const c = [...t]; c[i] = pre + x; add(c); });
+      // auxiliaire : j'ai allé / je suis mangé
+      const sw = FR_AUX_SWAP[core], nxt = t[i + 1] === "pas" ? t[i + 2] : t[i + 1];
+      if (sw && nxt && TF[nxt]) {
+        const c = [...t];
+        if (pre) c[i] = VOWEL.test(sw) ? pre + sw : (pre === "j'" ? "je " : pre === "n'" ? "ne " : "que ") + sw;
+        else if (VOWEL.test(sw) && ["je", "ne", "que"].includes(t[i - 1])) { c[i - 1] = t[i - 1].slice(0, -1) + "'" + sw; c.splice(i, 1); }
+        else c[i] = sw;
+        add(c);
+      }
+    });
+    // « pas » après le participe ou l'infinitif : je n'ai mangé pas
+    const j = t.indexOf("pas");
+    if (f === 1 && j > 0 && t[j + 1] && TF[t[j + 1]]) { const c = [...t]; [c[j], c[j + 1]] = [c[j + 1], c[j]]; add(c); }
+  }
   t.forEach((w, i) => {
     const m = w.match(/^(j'|l'|n'|d'|c'|qu')(.+)$/);
     const pre = m ? m[1] : "", core = m ? m[2] : w;
@@ -828,7 +909,7 @@ function corruptFR(sent, f) {
   out.delete(t.join(" "));
   return [...out];
 }
-const corruptions = (sent, f) => (COURSE.target === "fr" ? corruptFR(sent, f) : corruptEN(sent, f));
+const corruptions = (sent, f, tense = false) => (COURSE.target === "fr" ? corruptFR(sent, f, tense) : corruptEN(sent, f, tense));
 
 // =====================================================================
 //  GÉNÉRATION DES QUESTIONS
@@ -888,13 +969,15 @@ function genSpell(b, used) {
 }
 
 function genSentence(b, aid, used, st) {
-  const f = FORM[aid], si = pickWeighted(b.s.map(() => 1), used), sent = b.s[si];
+  // Niveau 2 : un temps, aux 3 formes mélangées
+  const tense = isTense(aid), list = tense ? b.t[aid] : b.s;
+  const f = tense ? rnd(3) : FORM[aid], si = pickWeighted(list.map(() => 1), used), sent = list[si];
   const tg = sent.tg[f], nat = sent.nat[f], target = tok(tg), suf = suffix(tg);
-  const bad = corruptions(sent, f);
+  const bad = corruptions(sent, f, tense);
   const types = ["build", "build"];
   if (bad.length >= 2 && st < 3) types.push("mcq");
   if (f > 0) types.push("transform");
-  const t = pick(types), tag = L("tagSentence", f);
+  const t = pick(types), tag = tense ? `${AT[aid].icon} ${attrName(aid)} · ${L("formName", f)}` : L("tagSentence", f);
   if (t === "mcq") {
     const opts = shuffle([tg, ...shuffle(bad).slice(0, 2).map((x) => show(x.split(" "), suf))]);
     return { kind: "mcq", col: true, tag, instr: L("qChoose"), prompt: nat, sentence: true,
@@ -918,9 +1001,11 @@ function genSentence(b, aid, used, st) {
 //   · l'affirmative toujours, la négative et la question seulement si 🚫 / ❓ sont appris sur la brique ;
 //   · pas deux fois la même phrase dans une séance (même sous une autre forme), et on évite les dernières sorties.
 function genOral(b, used) {
-  const bs = S.bricks[b.id];
-  const known = (f) => f === 0 || !!(bs.attrs[["aff", "neg", "q"][f]] && bs.attrs[["aff", "neg", "q"][f]].learned);
-  const items = [...b.o.map((x, k) => ["o" + k, x]), ...b.s.map((x, k) => ["s" + k, x])]
+  const bs = S.bricks[b.id], lv2 = b.lvl === 2;
+  // Niveau 2 : les 3 formes sont connues ; les phrases d'un temps s'ajoutent quand ce temps est appris sur la brique
+  const known = (f) => lv2 || f === 0 || !!(bs.attrs[["aff", "neg", "q"][f]] && bs.attrs[["aff", "neg", "q"][f]].learned);
+  const tenses = lv2 ? TENSE_IDS.filter((id) => bs.attrs[id] && bs.attrs[id].learned).flatMap((id) => b.t[id].map((x, k) => [id + "." + k, x])) : [];
+  const items = [...b.o.map((x, k) => ["o" + k, x]), ...b.s.map((x, k) => ["s" + k, x]), ...tenses]
     .flatMap(([base, x]) => x.tg.map((t, f) => ({ key: `${base}.${f}`, base, f, tg: t, nat: x.nat[f] })))
     .filter((x) => known(x.f));
   const recent = new Set((bs.oralRecent || []).slice(-Math.floor(items.length / 2)));
@@ -1493,6 +1578,7 @@ function enterPath(path) {
   if (S) save();
   COURSE = COURSES[path]; UI = COURSE.ui;
   BRICKS = COURSE.bricks; BR = COURSE.BR; SKILLS = COURSE.SKILLS; SK = COURSE.SK;
+  TENSE_IDS.forEach((id) => { AT[id].icon = COURSE.tenses[id].icon; });
   if (!P.paths[path]) P.paths[path] = typeof testFullPath === "function" ? testFullPath(COURSES[path]) : freshPath();
   S = P.paths[path]; P.lastPath = path;
   SEL = { type: "brick", id: "basics" };

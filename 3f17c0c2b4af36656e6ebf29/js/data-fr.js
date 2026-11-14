@@ -342,8 +342,8 @@ COURSES.fr = {
 
   // Plan after the Word Dragon ("What's next" window)
   roadmap: [
-    { icon: "⏳", title: "Level 2: tenses", gate: "Guarded by a 2nd dragon", items: [
-      "New 10-word bricks, with 📖 Vocabulary and ✍️ Spelling.",
+    { icon: "⏳", title: "Level 2: tenses ✅ available", gate: "Open after the Word Dragon · its guardian, the 2nd dragon, is coming soon", items: [
+      "12 new 10-word bricks, with 📖 Vocabulary, ✍️ Spelling and 🎤 Speaking.",
       "Their other upgrades become <b>tenses</b>, still in all 3 forms (affirmative, negative, question):",
       "⏪ <b>Passé composé</b>: <i>j'ai mangé</i>",
       "⏩ <b>Futur proche</b>: <i>je vais manger</i>",

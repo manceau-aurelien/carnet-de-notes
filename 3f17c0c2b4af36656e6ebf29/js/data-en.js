@@ -340,8 +340,8 @@ COURSES.en = {
 
   // Programme prévu après le Dragon des Mots (fenêtre « La suite »)
   roadmap: [
-    { icon: "⏳", title: "Niveau 2 : les temps", gate: "Gardé par un 2ᵉ dragon", items: [
-      "De nouvelles briques de 10 mots, avec 📖 Vocabulaire et ✍️ Orthographe.",
+    { icon: "⏳", title: "Niveau 2 : les temps ✅ disponible", gate: "Ouvert après le Dragon des Mots · son gardien, le 2ᵉ dragon, arrive bientôt", items: [
+      "12 nouvelles briques de 10 mots, avec 📖 Vocabulaire, ✍️ Orthographe et 🎤 Oral.",
       "Leurs autres attributs deviennent des <b>temps</b>, toujours aux 3 formes (affirmative, négative, question) :",
       "⏳ <b>Présent continu</b> : <i>I am eating</i>",
       "⏪ <b>Le passé</b> : <i>I ate, I was</i>",

@@ -553,7 +553,7 @@ function friendCards(f) {
     const c = COURSES[k], rk = c.ranks[Math.min(s.rank || 0, c.ranks.length - 1)][1];
     const streak = streakAlive(s.streakLast) ? s.streak : 0;
     return `<div class="fpath">${c.flag}<div class="f-main"><div><b>${PATH_NAMES[k][UI]}</b> · ${esc(rk)}</div>
-      <div class="fp-stats"><span>🎖️ ${s.xp} XP</span><span>🔥 ${streak}</span><span>🧱 ${s.bricks}/${c.bricks.length}</span><span>✨ ${s.attrs}/${c.bricks.length * ATTRS.length}</span><span>⭐ ${s.stars}</span><span>💡 ${fmt(s.savoir)}</span></div>
+      <div class="fp-stats"><span>🎖️ ${s.xp} XP</span><span>🔥 ${streak}</span><span>🧱 ${s.bricks}/${c.bricks.length}</span><span>✨ ${s.attrs}/${c.bricks.reduce((n, b) => n + attrsOf(b).length, 0)}</span><span>⭐ ${s.stars}</span><span>💡 ${fmt(s.savoir)}</span></div>
       ${s.boss ? `<div class="fp-boss">${s.boss.defeated ? L("friendBossWon") : L("friendBoss", s.boss.hp)}</div>` : ""}
       <div class="p-sub">${L("lastSession", fmtAgo(s.active))}</div></div></div>`;
   }).join("");

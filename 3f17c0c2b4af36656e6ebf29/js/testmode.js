@@ -16,7 +16,7 @@ function testFullPath(course) {
   st.streak = { days: 1, last: new Date().toDateString() };
   for (const b of course.bricks) {
     st.bricks[b.id] = {
-      attrs: Object.fromEntries(ATTRS.map((a) => [a.id, { learned: true, hl: 6 * DAY, last: now, reviews: 3 }])),
+      attrs: Object.fromEntries(attrsOf(b).map((a) => [a.id, { learned: true, hl: 6 * DAY, last: now, reviews: 3 }])),
       werr: Array(b.w.length).fill(1),
     };
   }

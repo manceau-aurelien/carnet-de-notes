@@ -30,7 +30,7 @@ Object.assign(STR.fr, {
   bossFight: "⚔️ Affronter le boss", bossHistory: "Dernières batailles",
   bossHistLine: (p, d) => `${p} % → ${d < 0 ? `<span class="up">${d} %</span>` : d > 0 ? `<span class="down">+${d} %</span>` : "aucun dégât"}`,
   bossDefeatedTitle: "🏆 Boss vaincu !", bossDefeatedText: (n, d) => `Tu as vaincu le Dragon des Mots en <b>${n}</b> tentative(s), le ${d}.`,
-  bossNext: "La suite de l'aventure (de nouvelles briques avec les <b>temps</b> : passé, futur…) arrive dans une prochaine mise à jour. Touche 🔭 <b>La suite</b> en haut de l'arbre pour voir le programme.",
+  bossNext: "Le <b>niveau 2</b> est ouvert : de nouvelles briques t'attendent sous le dragon, avec les <b>temps</b> (présent continu, passé, futur). Commence par la brique ⏰ <b>Le temps qui passe</b> !",
   bossRulesTitle: "Comment fonctionne le boss ?",
   bossRules: [
     "<b>🔓 Le débloquer</b><br>Valide au moins une fois : ❓ Interrogatif sur <b>3</b> briques, 🚫 Négatif sur <b>6</b>, ✅ Affirmatif sur <b>9</b> et ✍️ Orthographe sur <b>12</b>. Puis paie <b>10 000 💡</b>.",
@@ -66,7 +66,7 @@ Object.assign(STR.en, {
   bossFight: "⚔️ Fight the boss", bossHistory: "Latest battles",
   bossHistLine: (p, d) => `${p}% → ${d < 0 ? `<span class="up">${d}%</span>` : d > 0 ? `<span class="down">+${d}%</span>` : "no damage"}`,
   bossDefeatedTitle: "🏆 Boss defeated!", bossDefeatedText: (n, d) => `You defeated the Word Dragon in <b>${n}</b> attempt(s), on ${d}.`,
-  bossNext: "The rest of the adventure (new bricks with <b>tenses</b>: past, future…) is coming in a future update. Tap 🔭 <b>What's next</b> at the top of the tree to see the plan.",
+  bossNext: "<b>Level 2</b> is open: new bricks are waiting below the dragon, with <b>tenses</b> (passé composé, futur proche, imparfait). Start with the ⏰ <b>Time words</b> brick!",
   bossRulesTitle: "How does the boss work?",
   bossRules: [
     "<b>🔓 Unlocking it</b><br>Complete at least once: ❓ Questions on <b>3</b> bricks, 🚫 Negative on <b>6</b>, ✅ Affirmative on <b>9</b> and ✍️ Spelling on <b>12</b>. Then pay <b>10,000 💡</b>.",
@@ -121,7 +121,8 @@ function bossLinks() {
   return ["house", "body", "clothes"].map((id) => {
     const p = BR[id];
     return `<line class="boss-link ${bossState().unlocked ? "on" : ""}" x1="${p.x}%" y1="${nodeTop(p.y)}" x2="${BOSS.x}%" y2="${nodeTop(BOSS.y)}"/>`;
-  }).join("");
+  }).join("") + (lvl2Open() && BR.time   // le dragon vaincu ouvre le niveau 2
+    ? `<line class="${owned("time") ? "on" : "avail"}" x1="${BOSS.x}%" y1="${nodeTop(BOSS.y)}" x2="${BR.time.x}%" y2="${nodeTop(BR.time.y)}"/>` : "");
 }
 
 // ---------- Panneau ----------
@@ -248,7 +249,8 @@ function buildBossQuestions() {
   const canHear = HAS_TTS && sound();
   const nDict = canHear ? BOSS.dictation : 0, nWrite = BOSS.write + (BOSS.dictation - nDict);
   // Toutes les phrases de toutes les briques, dans toutes les formes
-  const pool = shuffle(BRICKS.flatMap((b) => b.s.flatMap((s, si) => [0, 1, 2].map((f) => ({ b, s, si, f })))));
+  const B1 = BRICKS.filter((b) => b.lvl !== 2);   // le Dragon des Mots garde le niveau 1
+  const pool = shuffle(B1.flatMap((b) => b.s.flatMap((s, si) => [0, 1, 2].map((f) => ({ b, s, si, f })))));
   const usedSent = new Set();
   const nextSent = () => { const x = pool.find((p) => !usedSent.has(p.b.id + p.si)); usedSent.add(x.b.id + x.si); return x; };
   const qs = [];
@@ -264,7 +266,7 @@ function buildBossQuestions() {
   }
   // 15 % : phrases du quotidien à dire au micro (toutes briques confondues)
   const nOral = CAN_LISTEN ? BOSS.oral : 0;
-  shuffle(BRICKS.flatMap((b) => b.o.map((o) => ({ b, o })))).slice(0, nOral).forEach(({ b, o }) => {
+  shuffle(B1.flatMap((b) => b.o.map((o) => ({ b, o })))).slice(0, nOral).forEach(({ b, o }) => {
     const f = Math.floor(Math.random() * 3), tg = o.tg[f];
     qs.push({ kind: "speak", sentence: true, tag: L("tagOral"), instr: L("qSpeakSentence"), prompt: tg, say: tg,
       sub: o.nat[f], subPlain: true, accept: [tg], solution: tg, bid: b.id, aid: "oral" });
@@ -272,7 +274,7 @@ function buildBossQuestions() {
   // Le reste : exercices déjà vus, piochés dans toutes les briques
   const classic = nOral ? ["vocab", "vocab", "spell", "s", "s", "s", "s"] : ["vocab", "vocab", "vocab", "spell", "spell", "s", "s", "s", "s", "s"];
   classic.forEach((t) => {
-    const b = pick(BRICKS);
+    const b = pick(B1);
     let q;
     if (t === "vocab") q = genVocab(b, new Set());
     else if (t === "spell") q = genSpell(b, new Set());

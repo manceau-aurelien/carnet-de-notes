@@ -5,6 +5,23 @@
 // =====================================================================
 const CHANGELOG = [
   {
+    date: "2026-11-14", icon: "⏳",
+    fr: { title: "Le niveau 2 est ouvert : les temps", items: [
+      "Après le <b>Dragon des Mots</b>, l'arbre continue : <b>12 nouvelles briques</b> (le temps qui passe, les jours, les nombres de 11 à 20, la météo, la ville, les transports, les loisirs…).",
+      "Chaque brique garde 📖 Vocabulaire, ✍️ Orthographe et 🎤 Oral, puis trois <b>temps</b> : ⏳ <b>présent continu</b>, ⏪ <b>passé</b> et ⏩ <b>futur</b>, toujours aux 3 formes (affirmative, négative, question).",
+      "Trois nouvelles leçons de grammaire, en haut de l'arbre, expliquent chaque temps.",
+      "À l'oral, les phrases d'un temps s'ajoutent dès que tu l'as appris sur la brique (toujours validé dès 50 %).",
+      "Les étages de l'arbre s'appellent maintenant « Niveau 1 · étage 1 », « Niveau 2 · étage 1 »…",
+    ] },
+    en: { title: "Level 2 is open: tenses", items: [
+      "After the <b>Word Dragon</b>, the tree goes on: <b>12 new bricks</b> (time words, days, numbers 11 to 20, weather, town, travel, free time…).",
+      "Each brick keeps 📖 Vocabulary, ✍️ Spelling and 🎤 Speaking, then three <b>tenses</b>: ⏪ <b>passé composé</b>, ⏩ <b>futur proche</b> and ⏳ <b>imparfait</b>, always in all 3 forms (affirmative, negative, question).",
+      "Three new grammar lessons, at the top of the tree, explain each tense.",
+      "In speaking practice, a tense's sentences are added once you've learned it on the brick (still passed from 50%).",
+      "Tree rows are now called “Level 1 · row 1”, “Level 2 · row 1”…",
+    ] },
+  },
+  {
     date: "2026-11-14", icon: "🔭",
     fr: { title: "Le programme de la suite", items: [
       "En haut de l'arbre, la brique <b>🔭 La suite</b> montre ce qui est prévu après le Dragon des Mots.",
