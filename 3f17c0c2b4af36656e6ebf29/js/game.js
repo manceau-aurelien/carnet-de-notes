@@ -264,8 +264,8 @@ function applyReview(a, score, aid) {
 
 // ---------- Débloquages ----------
 const owned = (id) => !!S.bricks[id];
-// Le niveau 2 s'ouvre quand le Dragon des Mots est vaincu (tout est ouvert sur le site de test)
-const lvl2Open = () => !!(window.BRICKS_TEST || (S && S.boss && S.boss.defeated));
+// Le niveau 2 s'ouvre quand le Dragon des Mots est vaincu
+const lvl2Open = () => !!(S && S.boss && S.boss.defeated);
 const shownBricks = () => BRICKS.filter((b) => b.lvl !== 2 || lvl2Open());
 const brickReqMet = (b) => (b.lvl !== 2 || lvl2Open()) && b.req.every(owned);
 const skillReqMet = (s) => (s.lvl !== 2 || lvl2Open()) && s.req.bricks.every(owned) && s.req.skills.every((x) => S.skills[x]);

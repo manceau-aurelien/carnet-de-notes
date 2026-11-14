@@ -21,7 +21,7 @@ function testFullPath(course) {
     };
   }
   for (const s of SKILL_DEF) st.skills[s.id] = true;
-  st.boss = { unlocked: true, hp: 100, attempts: 0, best: 0, defeated: false, history: [] };
+  st.boss = { unlocked: true, hp: 0, attempts: 1, best: 100, defeated: true, defeatedAt: now, history: [] };   // niveau 2 ouvert
   st.boss2 = { unlocked: true, hp: 100, attempts: 0, best: 0, defeated: false, history: [] };
   return st;
 }
@@ -43,7 +43,7 @@ function openTestMenu() {
     ["day", "⏳ Faire passer 1 jour (érosion)"],
     ["week", "⏳ Faire passer 7 jours (érosion)"],
     ["boss5", "🐉 Boss presque vaincu (5 % de vie)"],
-    ["boss100", "🐉 Boss à 100 %, pas encore débloqué"],
+    ["boss100", "🐉 Boss à 100 %, pas encore débloqué (niveau 2 en fantômes)"],
     ["boss2_5", "🐲 Dragon du Temps presque vaincu (5 % de vie)"],
     ["boss2_100", "🐲 Dragon du Temps à 100 %, pas encore débloqué"],
     ["news", "📜 Revoir les nouveautés comme jamais lues"],
