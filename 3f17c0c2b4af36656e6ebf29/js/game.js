@@ -216,11 +216,15 @@ function offlineGain(dt, from = Date.now()) {
 function erodedList() { const out = []; eachLearned((b, aid, a) => { if (ret(a) < 0.5) out.push({ b, aid, a }); }); return out; }
 
 // Révision : la demi-vie grandit d'autant plus que l'attribut était érodé
-function applyReview(a, score) {
+// Score à partir duquel un entraînement fait grandir la mémoire profonde (sinon elle baisse).
+// Exception provisoire : 🎤 Oral à 50 % (le micro reconnaît encore mal certaines phrases).
+const REVIEW_BY_ATTR = { oral: 0.5 };
+const reviewNeed = (aid) => (aid in REVIEW_BY_ATTR ? REVIEW_BY_ATTR[aid] : 0.7);
+function applyReview(a, score, aid) {
   const now = Date.now();
   if (!a.learned) { a.learned = true; a.hl = BASE_HL * (0.4 + score); a.last = now; a.reviews = 1; return; }
   const R = ret(a);
-  if (score >= 0.7) a.hl = Math.min(MAX_HL, a.hl * (1.05 + 1.8 * (1 - R) * score));
+  if (score >= reviewNeed(aid) - 1e-9) a.hl = Math.min(MAX_HL, a.hl * (1.05 + 1.8 * (1 - R) * score));
   else a.hl = Math.max(MIN_HL, a.hl * 0.6);
   a.last = now; a.reviews = (a.reviews || 0) + 1;
 }
@@ -571,7 +575,8 @@ function memoryInfoModal(b, aid) {
     <div class="m-body mem-info">
       <div class="mem-this">${L("memThis", AT[aid].icon, attrName(aid), Math.round(r * 100), `<span class="stars">${"★".repeat(st) || "–"}</span>`, fmtDur(a.hl))}
         <div class="p-sub">${next ? L("memNext", fmtDur(next)) : L("memMax")}</div></div>
-      ${L("memBody", tbl(L("memStarsHead"), starRows), tbl(L("memMultHead"), multRows))}
+      ${aid in REVIEW_BY_ATTR ? `<div class="mem-this oral-note" style="margin-top:12px">${L("oralMemNote", pct100(reviewNeed(aid)))}</div>` : ""}
+      ${L("memBody", tbl(L("memStarsHead"), starRows), tbl(L("memMultHead"), multRows), pct100(reviewNeed(aid)))}
     </div>
     <div class="m-foot"><div class="fb"></div><button class="btn btn-gold btn-big" data-x2>${L("gotIt")}</button></div>`);
   $("#modal [data-x]").onclick = closeModal; $("#modal [data-x2]").onclick = closeModal;
@@ -1376,7 +1381,7 @@ function finishSession() {
       if (score + 1e-9 < p1) p.viaCatchup = true;
       delete a.tries;
     }
-    applyReview(a, score);
+    applyReview(a, score, p.aid);
     const st = stars(a);
     if (st > p.starsBefore) toast(L("starUp", BR[p.bid].icon, attrName(p.aid), st));
     rows.push({ p, a, st });
@@ -1392,6 +1397,7 @@ function finishSession() {
   SES = null;
 
   const failed = rows.filter((r) => r.p.failed);
+  const tipNeed = rows.length && rows.every((r) => r.p.aid in REVIEW_BY_ATTR) ? pct100(reviewNeed(rows[0].p.aid)) : 70;
   const face = failed.length ? "💪" : pct === 100 ? "🏆" : pct >= 80 ? "🎉" : pct >= 60 ? "👍" : "💪";
   const rowsHtml = rows.map(({ p, a, st }) => {
     const b = BR[p.bid], at = AT[p.aid];
@@ -1412,7 +1418,7 @@ function finishSession() {
       <div class="res-sub">${L("firstTry", maxCombo)}</div>
       <div class="res-gain">+${gained} 💡${bonus ? ` <span class="p-sub">${L("perfectBonus", bonus)}</span>` : ""}</div></div>
       ${rowsHtml}${failed.length ? `<div class="pass-info hidden">${passRulesHtml(failed[0].p.failed, failed[0].p.aid)}</div>` : ""}
-      <div class="p-sub res-tip">${failed.length ? L("firstFailTip") : pct < 70 ? L("lowScore") : L("goodScore")}</div></div>
+      <div class="p-sub res-tip">${failed.length ? L("firstFailTip") : pct < tipNeed ? L("lowScore", tipNeed) : L("goodScore")}</div></div>
     <div class="m-foot"><div class="fb"></div><button class="btn" data-again>${L("again")}</button><button class="btn btn-gold btn-big" data-close>${L("cont")}</button></div>`, "session");
   $("#modal [data-x]").onclick = closeModal;
   $("#modal [data-close]").onclick = closeModal;

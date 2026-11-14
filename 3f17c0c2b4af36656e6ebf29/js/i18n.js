@@ -61,7 +61,8 @@ const STR = {
     firstLesson: "Première leçon",
     retryLesson: "🔁 Réessayer",
     needPct: (t, p1 = 70, p2 = 90) => `🎯 ${t ? `Essai n° ${t + 1} · ` : ""}Pour valider : <b>${p1} %</b> du premier coup, ou <b>${p2} %</b> avec le rattrapage.`,
-    oralPassNote: (p1, p2) => `🎤 <b>L'oral n'est pas encore tout à fait au point</b> : le micro reconnaît encore mal certaines phrases, même bien prononcées. En attendant, nous baissons volontairement les exigences pour valider cet attribut : <b>${p1} %</b> du premier coup, ou <b>${p2} %</b> avec le rattrapage (au lieu de 70 % et 90 %).`,
+    oralPassNote: (p1, p2) => `🎤 <b>L'oral n'est pas encore tout à fait au point</b> : le micro reconnaît encore mal certaines phrases, même bien prononcées. En attendant, nous baissons volontairement les exigences pour valider cet attribut : <b>${p1} %</b> du premier coup, ou <b>${p2} %</b> avec le rattrapage (au lieu de 70 % et 90 %).<br><br>Pareil pour <b>tous les entraînements d'oral</b> ensuite : ta mémoire profonde grandit dès <b>50 %</b> de réussite (au lieu de 70 %), et ne baisse qu'en dessous.`,
+    oralMemNote: (n) => `🎤 <b>L'oral n'est pas encore tout à fait au point</b> : le micro reconnaît encore mal certaines phrases, même bien prononcées. Pour cet attribut, nous baissons donc volontairement l'exigence : un entraînement est réussi dès <b>${n} %</b> (au lieu de 70 %).`,
     notValidated: "❌ Pas encore validé",
     savedByCatchup: "🔁 Validé grâce au rattrapage !",
     firstFailTip: "Pas encore validé, mais le Savoir gagné est conservé. Relis bien la leçon et retente ta chance ! Touche le <b>i</b> pour voir les conditions.",
@@ -79,16 +80,16 @@ const STR = {
     memCalc: (p, s) => `Mt ${p}% × Mp ${s}`,
     memInfoTip: "Comment ça marche ?",
     memTitle: "🧠 Les deux mémoires",
-    memBody: (stars, mult) => `
+    memBody: (stars, mult, need = 70) => `
       <h4>⏳ Mémoire temporaire (Mt) : la barre</h4>
       <p>Ce que tu as en tête <b>maintenant</b>. Elle remonte à 100 % après chaque entraînement, puis se vide toute seule avec le temps.</p>
       <h4>⭐ Mémoire profonde (Mp) : les étoiles</h4>
       <p>Combien de temps la connaissance tient avant que la moitié s'efface :</p>${stars}
-      <p>Elle ne baisse pas avec le temps, seulement si tu rates un entraînement (moins de 70 %).</p>
+      <p>Elle ne baisse pas avec le temps, seulement si tu rates un entraînement (moins de ${need} %).</p>
       <h4>💡 Production = Mt × Mp</h4>
       <p>Chaque étoile ajoute <b>+50 %</b> de production. La mémoire temporaire décide de la part encaissée : à 0 %, l'attribut ne rapporte plus rien. Les briques avancées et les attributs difficiles rapportent aussi davantage.</p>
       <h4>📈 Gagner des étoiles</h4>
-      <p>Réussis un entraînement (70 % ou plus). <b>Plus ta mémoire temporaire est basse</b> à ce moment-là, plus ta mémoire profonde grandit :</p>${mult}
+      <p>Réussis un entraînement (${need} % ou plus). <b>Plus ta mémoire temporaire est basse</b> à ce moment-là, plus ta mémoire profonde grandit :</p>${mult}
       <p>Mais tant que la barre est vide, l'attribut ne produit rien. À toi de trouver le bon moment !</p>`,
     memMultHead: ["Mt au moment de t'entraîner", "Mp multipliée par"],
     memStarsHead: ["Étoiles", "Tient environ"],
@@ -198,7 +199,7 @@ const STR = {
     perfectBonus: (n) => `(dont +${n} bonus sans-faute)`,
     isNew: "nouveau",
     holds: (d) => `tient ~${d} avant d'être érodé`,
-    lowScore: "Score < 70 % : la brique s'usera plus vite. Retente !",
+    lowScore: (n = 70) => `Score < ${n} % : la brique s'usera plus vite. Retente !`,
     goodScore: "Révise quand ça commence à s'éroder : c'est là que ça rapporte le plus.",
     again: "🔁 Encore",
     session: "Session",
@@ -312,7 +313,8 @@ const STR = {
     firstLesson: "First lesson",
     retryLesson: "🔁 Try again",
     needPct: (t, p1 = 70, p2 = 90) => `🎯 ${t ? `Attempt #${t + 1} · ` : ""}To pass: <b>${p1}%</b> on the first try, or <b>${p2}%</b> with the catch-up round.`,
-    oralPassNote: (p1, p2) => `🎤 <b>Speaking isn't quite ready yet</b>: the microphone still misses some sentences, even when they're well pronounced. Meanwhile, we're deliberately lowering the bar to pass this upgrade: <b>${p1}%</b> on the first try, or <b>${p2}%</b> with the catch-up round (instead of 70% and 90%).`,
+    oralPassNote: (p1, p2) => `🎤 <b>Speaking isn't quite ready yet</b>: the microphone still misses some sentences, even when they're well pronounced. Meanwhile, we're deliberately lowering the bar to pass this upgrade: <b>${p1}%</b> on the first try, or <b>${p2}%</b> with the catch-up round (instead of 70% and 90%).<br><br>Same for <b>every speaking practice</b> after that: your deep memory grows from <b>50%</b> correct (instead of 70%), and only drops below that.`,
+    oralMemNote: (n) => `🎤 <b>Speaking isn't quite ready yet</b>: the microphone still misses some sentences, even when they're well pronounced. So for this upgrade we're deliberately lowering the bar: a practice counts as passed from <b>${n}%</b> (instead of 70%).`,
     notValidated: "❌ Not passed yet",
     savedByCatchup: "🔁 Passed thanks to the catch-up round!",
     firstFailTip: "Not passed yet, but you keep the Knowledge you earned. Review the lesson and try again! Tap the <b>i</b> to see the rules.",
@@ -330,16 +332,16 @@ const STR = {
     memCalc: (p, s) => `ST ${p}% × DM ${s}`,
     memInfoTip: "How does it work?",
     memTitle: "🧠 Two kinds of memory",
-    memBody: (stars, mult) => `
+    memBody: (stars, mult, need = 70) => `
       <h4>⏳ Short-term memory (ST): the bar</h4>
       <p>What you have in mind <b>right now</b>. It goes back to 100% after each practice, then empties on its own over time.</p>
       <h4>⭐ Deep memory (DM): the stars</h4>
       <p>How long the knowledge lasts before half of it fades:</p>${stars}
-      <p>It doesn't drop over time, only when you fail a practice (under 70%).</p>
+      <p>It doesn't drop over time, only when you fail a practice (under ${need}%).</p>
       <h4>💡 Production = ST × DM</h4>
       <p>Each star adds <b>+50%</b> production. Short-term memory decides how much of it you collect: at 0%, the upgrade earns nothing. Advanced bricks and harder upgrades also earn more.</p>
       <h4>📈 Earning stars</h4>
-      <p>Pass a practice (70% or more). <b>The lower your short-term memory</b> at that moment, the more your deep memory grows:</p>${mult}
+      <p>Pass a practice (${need}% or more). <b>The lower your short-term memory</b> at that moment, the more your deep memory grows:</p>${mult}
       <p>But while the bar is empty, the upgrade produces nothing. Find the right moment!</p>`,
     memMultHead: ["ST when you practice", "DM multiplied by"],
     memStarsHead: ["Stars", "Lasts about"],
@@ -444,7 +446,7 @@ const STR = {
     perfectBonus: (n) => `(incl. +${n} perfect-score bonus)`,
     isNew: "new",
     holds: (d) => `holds ~${d} before eroding`,
-    lowScore: "Score under 70%: this brick will wear out faster. Try again!",
+    lowScore: (n = 70) => `Score under ${n}%: this brick will wear out faster. Try again!`,
     goodScore: "Review when things start to erode: that's when it pays the most.",
     again: "🔁 Again",
     session: "Session",

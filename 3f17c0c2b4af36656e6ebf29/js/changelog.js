@@ -9,12 +9,14 @@ const CHANGELOG = [
     fr: { title: "Oral : validation assouplie", items: [
       "Le micro reconnaît encore mal certaines phrases, même bien prononcées : l'oral n'est pas tout à fait au point.",
       "En attendant, la première leçon de <b>🎤 Oral</b> se valide avec <b>50 %</b> du premier coup, ou <b>60 %</b> avec le rattrapage (au lieu de 70 % et 90 %).",
-      "Un petit <b>i</b> sur la fiche de l'attribut l'explique. Les autres attributs ne changent pas.",
+      "Les <b>entraînements d'oral</b> aussi : ta mémoire profonde grandit dès <b>50 %</b> de réussite (au lieu de 70 %).",
+      "Le petit <b>i</b> de la fiche et celui de « Les deux mémoires » l'expliquent. Les autres attributs ne changent pas.",
     ] },
     en: { title: "Speaking: easier to pass", items: [
       "The microphone still misses some sentences, even when they're well pronounced: speaking isn't quite ready yet.",
       "Meanwhile, the first <b>🎤 Speaking</b> lesson passes with <b>50%</b> on the first try, or <b>60%</b> with the catch-up round (instead of 70% and 90%).",
-      "A small <b>i</b> on the upgrade's card explains it. The other upgrades don't change.",
+      "<b>Speaking practice</b> too: your deep memory grows from <b>50%</b> correct (instead of 70%).",
+      "The small <b>i</b> on the card and the one in “Two kinds of memory” explain it. The other upgrades don't change.",
     ] },
   },
   {
